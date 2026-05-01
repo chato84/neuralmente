@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuralMente — Tutor IA Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080b12; --surface: #0e1219; --surface2: #141923;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+  --text: #e8e6f0; --text2: #8b8a9b;
+  --teal: #00d9b0; --teal-dim: rgba(0,217,176,0.1); --teal-b: rgba(0,217,176,0.25);
+  --purple: #7c6cfc; --purple-dim: rgba(124,108,252,0.1); --purple-b: rgba(124,108,252,0.28);
+  --amber: #f0a935; --amber-dim: rgba(240,169,53,0.1); --amber-b: rgba(240,169,53,0.28);
+  --coral: #f0634a;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:10px;}
+.logo{font-weight:800;font-size:15px;letter-spacing:-.5px;display:flex;align-items:center;gap:7px;}
+.live{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,217,176,.4);}50%{box-shadow:0 0 0 5px rgba(0,217,176,0);}}
+.mod-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 11px;flex:1;max-width:340px;}
+.mod-pill span{font-size:12px;color:var(--text2);}
+.mod-pill strong{font-size:12px;color:var(--text);}
+.steps-row{display:flex;gap:4px;}
+.st{width:22px;height:4px;border-radius:99px;background:var(--border2);transition:background .4s;}
+.st.done{background:var(--teal);}
+.st.active{background:var(--purple);}
+.xp-chip{display:flex;align-items:center;gap:5px;background:var(--amber-dim);border:1px solid var(--amber-b);border-radius:8px;padding:5px 11px;font-size:13px;font-weight:600;color:var(--amber);white-space:nowrap;}
+
+/* LAYOUT */
+.layout{flex:1;display:grid;grid-template-columns:220px 1fr;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-head{padding:14px;}
+.sb-title{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--text2);margin-bottom:10px;}
+.lesson-list{display:flex;flex-direction:column;gap:3px;}
+.li{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:12px;color:var(--text2);border:1px solid transparent;cursor:pointer;transition:all .15s;}
+.li:hover{background:var(--surface2);}
+.li.active{background:var(--purple-dim);border-color:var(--purple-b);color:var(--text);}
+.li.done{color:var(--teal);}
+.li-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);flex-shrink:0;}
+.li.active .li-num{color:var(--purple);}
+.li.done .li-num{color:var(--teal);}
+.sb-footer{padding:14px;border-top:1px solid var(--border);margin-top:auto;}
+.badge-card{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:8px 10px;}
+.badge-ico{width:28px;height:28px;border-radius:7px;background:var(--teal-dim);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.badge-name{font-size:12px;font-weight:500;}
+.badge-sub{font-size:10px;color:var(--text2);}
+
+/* CHAT */
+.chat-panel{display:flex;flex-direction:column;overflow:hidden;}
+.messages{flex:1;overflow-y:auto;padding:20px 18px;display:flex;flex-direction:column;gap:13px;scroll-behavior:smooth;}
+.messages::-webkit-scrollbar{width:3px;}
+.messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+/* MESSAGES */
+.msg{display:flex;gap:9px;animation:fadeUp .3s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.msg.ai{align-self:flex-start;max-width:84%;}
+.msg.user{align-self:flex-end;max-width:72%;flex-direction:row-reverse;}
+.av{width:29px;height:29px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:2px;}
+.av.ai{background:linear-gradient(135deg,var(--purple),var(--teal));}
+.av.user{background:var(--surface2);border:1px solid var(--border2);}
+.bubble{padding:11px 14px;border-radius:15px;font-size:13.5px;line-height:1.65;}
+
+.msg.ai.teaching .bubble{background:linear-gradient(135deg,rgba(0,217,176,.07),rgba(0,217,176,.02));border:1px solid rgba(0,217,176,.18);border-top-left-radius:4px;}
+.msg.ai.question .bubble{background:linear-gradient(135deg,rgba(124,108,252,.1),rgba(124,108,252,.03));border:1px solid rgba(124,108,252,.25);border-top-left-radius:4px;}
+.msg.ai.exercise .bubble{background:linear-gradient(135deg,rgba(240,169,53,.08),rgba(240,169,53,.02));border:1px solid rgba(240,169,53,.25);border-top-left-radius:4px;}
+.msg.ai.feedback .bubble{background:linear-gradient(135deg,rgba(0,217,176,.1),rgba(0,217,176,.03));border:1px solid rgba(0,217,176,.28);border-top-left-radius:4px;}
+.msg.ai.answer .bubble{background:var(--surface2);border:1px solid var(--border2);border-top-left-radius:4px;}
+.msg.user .bubble{background:rgba(124,108,252,.2);border:1px solid rgba(124,108,252,.3);border-top-right-radius:4px;}
+
+.tag{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:4px;}
+.tt{color:var(--teal)}.tq{color:var(--purple)}.te{color:var(--amber)}.tf{color:var(--teal)}.ta{color:var(--text2);}
+.bubble p{margin-bottom:4px;}.bubble p:last-child{margin-bottom:0;}
+
+/* Concept card */
+.ccard{margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border2);}
+.ccard-head{background:var(--surface2);padding:7px 12px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--amber);}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;}
+.ccol{padding:11px 12px;font-size:12px;line-height:1.5;color:var(--text2);}
+.ccol:first-child{border-right:1px solid var(--border);}
+.ccol strong{display:block;color:var(--text);font-size:12.5px;margin-bottom:3px;}
+
+/* Typing */
+.typing-wrap{display:flex;gap:9px;align-items:center;align-self:flex-start;animation:fadeUp .3s ease both;}
+.typing-bub{padding:11px 14px;background:var(--surface2);border-radius:15px;border-top-left-radius:4px;border:1px solid var(--border2);display:flex;gap:4px;align-items:center;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--text2);animation:bounce 1.2s ease infinite;}
+.dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+
+/* Mode bar */
+.mode-bar{padding:5px 18px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.mode-lbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:5px;}
+.mdot{width:5px;height:5px;border-radius:50%;}
+.m-teaching .mdot{background:var(--teal);}.m-teaching{color:var(--teal);}
+.m-answer .mdot{background:var(--text2);}.m-answer{color:var(--text2);}
+.mode-hint{font-size:10px;color:var(--text2);}
+
+/* QR */
+.qr-row{display:flex;flex-wrap:wrap;gap:5px;padding:7px 18px 3px;flex-shrink:0;}
+.qr{background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:5px 13px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .15s;}
+.qr:hover{background:var(--purple-dim);border-color:var(--purple-b);color:var(--text);}
+
+/* Input */
+.input-wrap{padding:9px 18px 14px;display:flex;gap:9px;flex-shrink:0;}
+.chat-in{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:11px;padding:10px 14px;font-size:13.5px;color:var(--text);font-family:inherit;outline:none;resize:none;min-height:42px;max-height:90px;transition:border-color .2s;}
+.chat-in::placeholder{color:var(--text2);}
+.chat-in:focus{border-color:var(--purple-b);}
+.send{width:42px;height:42px;border-radius:10px;background:var(--purple);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,transform .1s;}
+.send:hover{background:#6a5ce8;transform:scale(1.05);}
+.send:disabled{background:rgba(124,108,252,.3);cursor:not-allowed;transform:none;}
+
+/* XP popup */
+.xp-pop{position:fixed;bottom:75px;right:18px;background:var(--surface2);border:1px solid var(--amber-b);border-radius:11px;padding:9px 15px;font-size:13px;font-weight:700;color:var(--amber);display:none;z-index:50;}
+@keyframes popUp{from{opacity:0;transform:translateY(8px) scale(.9);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+@media(max-width:580px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><div class="live"></div>NeuralMente</div>
+  <div class="mod-pill">
+    <span>Módulo 1 ·</span>
+    <strong>¿Qué es la Inteligencia Artificial?</strong>
+  </div>
+  <div class="steps-row" id="steps">
+    <div class="st active"></div><div class="st"></div><div class="st"></div>
+    <div class="st"></div><div class="st"></div>
+  </div>
+  <div class="xp-chip">⭐ <span id="xp-n">0</span> / 300 XP</div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-title">Track 1 — Principiante</div>
+      <div class="lesson-list">
+        <div class="li active"><span class="li-num">1.1</span><span>¿Qué es la IA?</span></div>
+        <div class="li"><span class="li-num">1.2</span><span>El arte del prompting</span></div>
+        <div class="li"><span class="li-num">1.3</span><span>Herramientas del día a día</span></div>
+        <div class="li"><span class="li-num">1.4</span><span>IA Creativa</span></div>
+        <div class="li"><span class="li-num">1.5</span><span>IA Responsable</span></div>
+        <div class="li"><span class="li-num">1.6</span><span>Proyecto Final</span></div>
+      </div>
+    </div>
+    <div class="sb-footer">
+      <div class="sb-title">Mis badges</div>
+      <div class="badge-card">
+        <div class="badge-ico">🌱</div>
+        <div>
+          <div class="badge-name">Explorador IA</div>
+          <div class="badge-sub">En progreso...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-panel">
+    <div class="messages" id="chat"></div>
+    <div class="mode-bar">
+      <div class="mode-lbl m-teaching" id="mode-lbl">
+        <div class="mdot"></div><span id="mode-txt">Clase en curso</span>
+      </div>
+      <div class="mode-hint" id="mode-hint">El tutor lleva la clase — tú participas</div>
+    </div>
+    <div class="qr-row" id="qr"></div>
+    <div class="input-wrap">
+      <textarea class="chat-in" id="inp" placeholder="Escribe tu respuesta o cualquier pregunta..." rows="1"></textarea>
+      <button class="send" id="sendbtn" onclick="send()">
+        <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+          <path d="M15.5 2.5L8 10M15.5 2.5L10.5 16L8 10M15.5 2.5L2 7L8 10" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="xp-pop" id="xp-pop"></div>
+
+<script>
+// ─── STATE ───
+let xp = 0, step = 0, busy = false;
+const chat = document.getElementById('chat');
+const qr = document.getElementById('qr');
+const inp = document.getElementById('inp');
+const btn = document.getElementById('sendbtn');
+
+// ─── LESSON SCRIPT ───
+// El tutor lleva la clase. Cada entrada tiene:
+//  type: estilo visual
+//  tag: etiqueta visible
+//  text: lo que dice el tutor
+//  card: tarjeta visual opcional
+//  qrs: respuestas rápidas para el alumno
+//  waitUser: espera respuesta antes de seguir
+//  xp: XP que gana el alumno en este paso
+//  autoDelay: ms antes de continuar automáticamente
+const SCRIPT = [
+  {
+    type:'teaching', tag:'🎓 Bienvenida', waitUser:true,
+    text:'¡Hola! Bienvenido a NeuralMente. Soy tu tutor de IA y voy a llevarte de cero a experto en este track.\n\nNo necesitas saber nada de tecnología para empezar. Solo necesitas curiosidad.\n\nAntes de empezar, dime: ¿a qué te dedicas actualmente? Quiero que todos mis ejemplos sean útiles en tu vida real.',
+    qrs:['Tengo un negocio', 'Soy empleado', 'Soy estudiante', 'Soy freelancer'],
+  },
+  {
+    type:'teaching', tag:'🎓 Concepto 1 — ¿Qué es la IA?', waitUser:false, autoDelay:2200,
+    text:'¡Perfecto! Voy a usar eso en todos mis ejemplos.\n\nEmpecemos con la pregunta más importante: ¿qué es la IA?\n\nImagina que enseñas a un niño a reconocer perros. No le das reglas: "tiene 4 patas, cola y orejas." En cambio, le muestras miles de fotos diciendo "esto es un perro." Después de suficientes fotos, el niño aprende solo — incluso reconoce perros que nunca vio antes.\n\n🧠 La IA funciona exactamente igual. No se programan reglas. Se muestran millones de ejemplos y el sistema aprende los patrones por sí solo.',
+    card:'comparison',
+    qrs:[],
+  },
+  {
+    type:'question', tag:'🤔 Verificación de comprensión', waitUser:true,
+    text:'Antes de continuar — con tus propias palabras, ¿cómo explicarías qué es la IA a un amigo que no sabe nada de tecnología?\n\nNo te preocupes si no es perfecto. Esto me ayuda a ver en qué enfocarnos.',
+    qrs:['Es una computadora que aprende sola', 'Es lo que usa Netflix para recomendar', 'Todavía no entendí del todo', 'Es un robot inteligente'],
+  },
+  {
+    type:'feedback', tag:'⭐ Feedback + Concepto 2', waitUser:false, autoDelay:2500,
+    text:'¡Muy bien! Esa es exactamente la intuición correcta. La IA aprende de ejemplos, no de reglas escritas a mano.\n\nAhora el siguiente concepto — y este confunde a mucha gente:\n\nMucha gente usa "IA", "Machine Learning" y "ChatGPT" como si fueran lo mismo. No lo son.\n\n🚗 Piénsalo como vehículos:\n• Inteligencia Artificial = "vehículo" (concepto general)\n• Machine Learning = "automóvil" (tipo más popular de IA)\n• ChatGPT / Claude = "Tesla" (modelo específico)\n\nCada uno está dentro del anterior — como muñecas rusas.',
+    qrs:[],
+  },
+  {
+    type:'question', tag:'🤔 ¿Entendiste la jerarquía?', waitUser:true,
+    text:'Pregunta rápida para verificar:\n\n¿Puede existir Inteligencia Artificial que NO use Machine Learning?\n\nPiénsalo un momento antes de responder.',
+    qrs:['Sí, puede existir', 'No, siempre usa ML', 'No estoy seguro'],
+  },
+  {
+    type:'feedback', tag:'⭐ +50 XP · Respuesta correcta', waitUser:false, autoDelay:2200, xp:50,
+    text:'¡Correcto! Sí puede existir.\n\nLos primeros sistemas de IA de los años 80 usaban reglas escritas por humanos — no Machine Learning. Se llamaban "sistemas expertos."\n\nHoy son menos comunes, pero existen. La mayoría de la IA moderna SÍ usa Machine Learning porque es mucho más poderoso.\n\nSiguiente tema: la IA en tu vida diaria.',
+    qrs:[],
+  },
+  {
+    type:'exercise', tag:'📝 Ejercicio — Identifica la IA', waitUser:true,
+    text:'Vamos a practicar. Te doy 3 herramientas — dime qué tipo de IA es cada una:\n\n1️⃣ Google Translate\n2️⃣ El algoritmo de TikTok (que elige qué videos ves)\n3️⃣ Tu teclado que sugiere palabras mientras escribes\n\nEscribe tu respuesta. No hay trampa — solo quiero ver cómo razonas.',
+    qrs:['Las 3 son IA de lenguaje', 'TikTok es diferente a las otras dos', 'No estoy seguro de todas'],
+  },
+  {
+    type:'feedback', tag:'🏆 +75 XP · ¡Excelente!', waitUser:false, autoDelay:2500, xp:75,
+    text:'¡Perfecto!\n\n✅ Google Translate → IA de lenguaje (entrenada con millones de textos traducidos)\n✅ TikTok → IA de recomendación (predice qué video querrás ver basándose en tu historial)\n✅ Teclado → IA de lenguaje personalizada (aprende específicamente CÓMO escribes tú)\n\nYa estás leyendo la IA en tu vida diaria. Ahora el último concepto — los mitos.',
+    qrs:[],
+  },
+  {
+    type:'teaching', tag:'🎓 Concepto 4 — Mitos de la IA', waitUser:true,
+    text:'Hay mucha desinformación sobre la IA. Voy a darte las 2 verdades más importantes:\n\n❌ MITO 1: "La IA siempre dice la verdad"\n✅ REALIDAD: Los modelos como yo podemos "alucinar" — inventar información que suena convincente pero es incorrecta. Nunca tomes decisiones importantes basándote solo en IA.\n\n❌ MITO 2: "La IA va a reemplazar a todos"\n✅ REALIDAD: La IA reemplaza TAREAS, no personas completas. Quien usa IA va a reemplazar a quien no la usa.\n\n¿Alguno de estos te sorprendió?',
+    qrs:['Sí, no sabía lo de las alucinaciones', 'Ya lo sabía', '¿Entonces para qué sirve?'],
+  },
+  {
+    type:'exercise', tag:'🏆 Reto Final del Módulo', waitUser:true,
+    text:'Llegaste al último paso del Módulo 1.\n\nPara ganar los 300 XP completos y desbloquear el Módulo 2, tienes una misión de 24 horas:\n\nLleva un registro de TODOS los momentos donde detectes IA en tu vida. Necesito AL MENOS 5 ejemplos con este formato:\n\n• ¿Qué herramienta o servicio?\n• ¿Qué tipo de IA es?\n• ¿Cómo te afectó?\n\nCuando tengas tu lista, escríbela aquí y yo la evalúo. El Módulo 2 se desbloquea al aprobar.\n\n¿Aceptas el reto?',
+    qrs:['¡Acepto el reto! 🔥', 'Tengo una pregunta primero'],
+  },
+  {
+    type:'feedback', tag:'🎉 ¡Módulo 1 casi completado!', waitUser:false, xp:175,
+    text:'¡Excelente actitud! Ya tienes todo para completar el reto.\n\nRecuerda: no busques IA adrede. Solo presta atención a tu día normal — Netflix, el banco, Google Maps, las apps del teléfono, el correo que filtra spam... están llenos de IA que ya usas sin notarlo.\n\nEn cuanto tengas tus 5 ejemplos, regresa aquí y te evalúo. 🔍\n\n¡Hasta pronto, futuro experto en IA! 🚀',
+    qrs:[],
+  },
+];
+
+// Respuestas a preguntas fuera del guión (modo pregunta)
+const QUESTION_ANSWERS = [
+  { pattern: /algoritmo/i, answer: 'Un algoritmo es simplemente una secuencia de pasos para resolver un problema — como una receta de cocina. En IA, los algoritmos son los "procesos de aprendizaje" que el sistema usa para encontrar patrones en los datos.' },
+  { pattern: /chatgpt|gpt/i, answer: 'ChatGPT es un modelo de lenguaje creado por OpenAI. Funciona prediciendo la siguiente palabra más probable en una conversación, basándose en haber "leído" una enorme cantidad de texto de internet. Es una herramienta poderosa pero no perfecta.' },
+  { pattern: /claude/i, answer: 'Claude soy yo — un modelo de lenguaje creado por Anthropic. Funciono de manera similar a ChatGPT pero con diferencias en entrenamiento y enfoque. Anthropic me diseñó con énfasis en seguridad y honestidad.' },
+  { pattern: /diferencia|vs|mejor/i, answer: 'Cada modelo tiene fortalezas. ChatGPT tiene integración con imágenes y búsqueda web. Claude maneja documentos muy largos y tiende a ser más detallado en explicaciones. Gemini de Google está integrado con sus servicios. Lo mejor es probarlos todos para tu caso de uso específico.' },
+  { pattern: /costo|precio|gratis|pagar/i, answer: 'La mayoría tienen versión gratuita con límites. ChatGPT Plus cuesta ~$20/mes. Claude Pro ~$20/mes. Para uso básico, las versiones gratuitas son suficientes para aprender. A medida que lo uses para trabajo, vale la pena pagar.' },
+  { pattern: /trabajo|empleo|reemplaz/i, answer: 'La IA va a transformar el trabajo, no eliminar todos los empleos. Históricamente, cada tecnología (imprenta, electricidad, computadoras) eliminó algunos trabajos pero creó muchos más nuevos. Lo importante es aprender a usar IA — eso te hace más valioso, no menos.' },
+  { pattern: /peligros?|riesgos?|malo/i, answer: 'Los riesgos reales son: desinformación (la IA puede generar contenido falso convincente), sesgos (aprende de datos humanos que tienen sesgos), privacidad (nunca compartas datos personales sensibles con IA), y dependencia excesiva. Por eso es importante aprender a usarla con criterio.' },
+];
+
+// ─── UI HELPERS ───
+function scrollDown(){ chat.scrollTop = chat.scrollHeight; }
+
+function addTyping(){
+  const el = document.createElement('div');
+  el.className = 'typing-wrap'; el.id = 'typing';
+  el.innerHTML = `<div class="av ai">🤖</div><div class="typing-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  chat.appendChild(el); scrollDown();
+}
+function removeTyping(){ const el = document.getElementById('typing'); if(el) el.remove(); }
+
+function addMsg(type, tag, text, withCard){
+  const tagClass = {teaching:'tt', question:'tq', exercise:'te', feedback:'tf', answer:'ta'}[type]||'ta';
+  const wrap = document.createElement('div');
+  wrap.className = `msg ai ${type}`;
+  const av = document.createElement('div'); av.className='av ai'; av.textContent='🤖';
+  const bub = document.createElement('div'); bub.className='bubble';
+  const tagEl = document.createElement('div'); tagEl.className=`tag ${tagClass}`; tagEl.textContent=tag;
+  bub.appendChild(tagEl);
+  text.split('\n').forEach(line=>{ const p=document.createElement('p'); p.textContent=line; bub.appendChild(p); });
+  if(withCard) bub.appendChild(makeCompCard());
+  wrap.appendChild(av); wrap.appendChild(bub);
+  chat.appendChild(wrap); scrollDown();
+}
+
+function makeCompCard(){
+  const c = document.createElement('div'); c.className='ccard';
+  c.innerHTML=`<div class="ccard-head">¿Cómo aprenden los sistemas?</div>
+  <div class="cgrid">
+    <div class="ccol"><strong>💻 Programación clásica</strong>Un humano escribe todas las reglas. La computadora las sigue sin pensar.</div>
+    <div class="ccol"><strong>🧠 Inteligencia Artificial</strong>Le damos millones de ejemplos. El sistema descubre los patrones solo.</div>
+  </div>`; return c;
+}
+
+function addUserMsg(text){
+  const wrap = document.createElement('div'); wrap.className='msg user';
+  const av = document.createElement('div'); av.className='av user'; av.textContent='👤';
+  const bub = document.createElement('div'); bub.className='bubble'; bub.textContent=text;
+  wrap.appendChild(av); wrap.appendChild(bub); chat.appendChild(wrap); scrollDown();
+}
+
+function setQRs(items){
+  qr.innerHTML='';
+  items.forEach(r=>{ const b=document.createElement('button'); b.className='qr'; b.textContent=r;
+    b.onclick=()=>{ inp.value=r; send(); }; qr.appendChild(b); });
+}
+
+function addXP(amount){
+  xp+=amount; document.getElementById('xp-n').textContent=xp;
+  const pop=document.getElementById('xp-pop'); pop.textContent=`+${amount} XP ⭐`;
+  pop.style.display='block'; pop.style.animation='none'; pop.offsetHeight;
+  pop.style.animation='popUp .4s cubic-bezier(.34,1.56,.64,1) both';
+  setTimeout(()=>pop.style.display='none', 2500);
+}
+
+function updateSteps(){
+  const dots=document.querySelectorAll('.st');
+  const stepMap=[0,0,1,1,2,2,3,3,4,4,4];
+  const active=stepMap[Math.min(step,stepMap.length-1)]||0;
+  dots.forEach((d,i)=>{ d.classList.remove('done','active');
+    if(i<active) d.classList.add('done'); else if(i===active) d.classList.add('active'); });
+}
+
+function setMode(teaching){
+  const lbl=document.getElementById('mode-lbl');
+  const txt=document.getElementById('mode-txt');
+  const hint=document.getElementById('mode-hint');
+  if(teaching){ lbl.className='mode-lbl m-teaching'; txt.textContent='Clase en curso'; hint.textContent='El tutor lleva la clase — tú participas'; }
+  else { lbl.className='mode-lbl m-answer'; txt.textContent='Respondiendo tu pregunta'; hint.textContent='El tutor retomará la clase después'; }
+}
+
+// ─── DETECT QUESTION ───
+function isQuestion(text){
+  const t = text.toLowerCase();
+  return t.includes('?') || t.startsWith('qué') || t.startsWith('cómo') ||
+    t.startsWith('por qué') || t.startsWith('cuál') || t.startsWith('cuándo') ||
+    t.startsWith('dónde') || t.startsWith('quién');
+}
+
+function findAnswer(text){
+  const t = text.toLowerCase();
+  for(const qa of QUESTION_ANSWERS){
+    if(qa.pattern.test(t)) return qa.answer;
+  }
+  return `Muy buena pregunta sobre "${text.substring(0,40)}...".\n\nEsto lo vamos a explorar más a fondo en los próximos módulos. Por ahora, la clave es entender que la IA aprende de datos y patrones, no de reglas programadas. ¿Seguimos con la clase?`;
+}
+
+// ─── CORE ENGINE ───
+async function runStep(s){
+  if(s >= SCRIPT.length) return;
+  busy=true; btn.disabled=true;
+
+  const item = SCRIPT[s];
+  addTyping();
+  await wait(800 + Math.random()*400);
+  removeTyping();
+  addMsg(item.type, item.tag, item.text, item.card==='comparison');
+  if(item.xp) addXP(item.xp);
+  updateSteps();
+
+  if(item.waitUser){
+    setQRs(item.qrs||[]);
+    busy=false; btn.disabled=false;
+    setMode(true);
+  } else {
+    setQRs([]);
+    busy=false; btn.disabled=false;
+    await wait(item.autoDelay||1800);
+    step++;
+    runStep(step);
+  }
+}
+
+async function send(){
+  const text = inp.value.trim();
+  if(!text || busy) return;
+  busy=true; btn.disabled=true;
+  inp.value=''; inp.style.height='auto';
+  setQRs([]);
+  addUserMsg(text);
+
+  // Detect off-topic question
+  if(step > 0 && step < SCRIPT.length-1 && isQuestion(text) &&
+     !['sí','si','no','entendí','entendi','aceptas','acepto','ok'].some(w=>text.toLowerCase().includes(w))){
+    setMode(false);
+    addTyping();
+    await wait(700+Math.random()*300);
+    removeTyping();
+    const ans = findAnswer(text);
+    addMsg('answer','💬 Respuesta a tu pregunta', ans + '\n\n📍 Retomando la clase donde estábamos...', false);
+    await wait(1200);
+    setMode(true);
+    busy=false; btn.disabled=false;
+    setQRs(SCRIPT[step]?.qrs||[]);
+    return;
+  }
+
+  // Normal flow
+  await wait(300);
+  step++;
+  updateSteps();
+  runStep(step);
+}
+
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+document.getElementById('inp').addEventListener('keydown', e=>{
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); send(); }
+});
+document.getElementById('inp').addEventListener('input',function(){
+  this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,90)+'px';
+});
+
+// ─── START ───
+runStep(0);
+</script>
+</body>
+</html>

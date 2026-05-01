@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuralMente — Mapa Completo de la Academia</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--s1:#0d1117;--s2:#131b24;--s3:#1a2333;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.12);
+  --tx:#e8e6f0;--tx2:#8b8a9b;--tx3:#4a4958;
+  --t1:#00d9b0; /* verde - principiante */
+  --t2:#f0a935; /* amber - intermedio */
+  --t3:#7c6cfc; /* purple - avanzado */
+  --t4:#f0634a; /* coral - experto */
+  --t5:#4a90e2; /* blue - master */
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding:32px 16px;}
+
+/* ── HEADER ── */
+.header{text-align:center;margin-bottom:48px;}
+.header-logo{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t1);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.logo-dot{width:6px;height:6px;border-radius:50%;background:var(--t1);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,217,176,.4);}50%{box-shadow:0 0 0 5px transparent;}}
+.header h1{font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:10px;}
+.header h1 span{color:var(--t1);}
+.header p{font-size:15px;color:var(--tx2);max-width:520px;margin:0 auto 24px;}
+
+/* Stats row */
+.stats{display:flex;justify-content:center;gap:clamp(16px,4vw,48px);flex-wrap:wrap;margin-bottom:48px;}
+.stat{text-align:center;}
+.stat-n{font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-1px;}
+.stat-l{font-size:11px;color:var(--tx2);font-weight:500;margin-top:2px;}
+
+/* ── JOURNEY BAR ── */
+.journey{display:flex;align-items:center;gap:0;margin-bottom:48px;overflow-x:auto;padding:4px 0;justify-content:center;}
+.jstep{display:flex;align-items:center;gap:0;cursor:pointer;}
+.jstep-pill{padding:7px 16px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap;border:1px solid transparent;transition:all .2s;}
+.jstep-pill:hover{transform:translateY(-2px);}
+.jstep-arrow{font-size:14px;color:var(--tx3);padding:0 4px;flex-shrink:0;}
+.jstep-pill.t1{background:rgba(0,217,176,.12);border-color:rgba(0,217,176,.3);color:var(--t1);}
+.jstep-pill.t2{background:rgba(240,169,53,.12);border-color:rgba(240,169,53,.3);color:var(--t2);}
+.jstep-pill.t3{background:rgba(124,108,252,.12);border-color:rgba(124,108,252,.3);color:var(--t3);}
+.jstep-pill.t4{background:rgba(240,99,74,.12);border-color:rgba(240,99,74,.3);color:var(--t4);}
+.jstep-pill.t5{background:rgba(74,144,226,.12);border-color:rgba(74,144,226,.3);color:var(--t5);}
+
+/* ── TRACKS ── */
+.tracks{display:flex;flex-direction:column;gap:32px;max-width:1100px;margin:0 auto;}
+
+.track{border-radius:16px;overflow:hidden;border:1px solid var(--b1);}
+.track-header{padding:20px 24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;cursor:pointer;transition:background .2s;}
+.track-header:hover{background:rgba(255,255,255,.02);}
+.track-header-left{display:flex;align-items:flex-start;gap:14px;}
+.track-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.track-info{}
+.track-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+.track-name{font-size:18px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px;}
+.track-desc{font-size:13px;color:var(--tx2);line-height:1.5;max-width:500px;}
+.track-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.track-meta-chip{font-size:11px;padding:3px 9px;border-radius:99px;font-weight:500;}
+.track-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;}
+.track-xp{font-size:22px;font-weight:900;letter-spacing:-.5px;}
+.track-xp span{font-size:12px;font-weight:500;opacity:.6;}
+.track-chevron{font-size:16px;color:var(--tx3);transition:transform .3s;}
+.track-chevron.open{transform:rotate(180deg);}
+.track-badge{font-size:11px;padding:4px 12px;border-radius:99px;font-weight:600;}
+
+/* Modules grid */
+.modules{display:none;padding:0 20px 20px;}
+.modules.open{display:block;}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+
+.mod{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.mod::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
+.mod:hover{border-color:var(--b2);transform:translateY(-2px);}
+.mod-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.mod-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;}
+.mod-xp{font-size:10px;font-weight:600;color:var(--tx2);}
+.mod-name{font-size:13px;font-weight:700;margin-bottom:5px;line-height:1.3;}
+.mod-desc{font-size:11px;color:var(--tx2);line-height:1.5;margin-bottom:8px;}
+.mod-chips{display:flex;flex-wrap:wrap;gap:4px;}
+.mod-chip{font-size:9px;padding:2px 7px;border-radius:99px;color:var(--tx3);border:1px solid var(--b1);}
+.mod-duration{font-size:10px;color:var(--tx3);margin-top:6px;}
+
+/* Project badge */
+.mod.project{border-style:dashed;}
+.project-crown{position:absolute;top:10px;right:10px;font-size:14px;}
+
+/* Summary row */
+.track-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;padding:12px;background:var(--s3);border-radius:10px;}
+.ts-item{text-align:center;}
+.ts-num{font-size:16px;font-weight:800;letter-spacing:-.3px;}
+.ts-lbl{font-size:9px;color:var(--tx2);font-weight:500;}
+
+/* Duration bar */
+.duration-bar{height:4px;border-radius:99px;margin-bottom:16px;overflow:hidden;background:var(--s3);}
+.duration-fill{height:100%;border-radius:99px;}
+
+/* ── LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2);}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+/* ── TOTAL SUMMARY ── */
+.total-card{max-width:700px;margin:40px auto 0;background:var(--s1);border:1px solid var(--b2);border-radius:16px;padding:28px;text-align:center;}
+.total-title{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t1);margin-bottom:16px;}
+.total-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.total-item{background:var(--s2);border-radius:10px;padding:14px;}
+.total-n{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:2px;}
+.total-l{font-size:11px;color:var(--tx2);}
+.total-desc{font-size:13px;color:var(--tx2);line-height:1.7;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo"><div class="logo-dot"></div>NeuralMente · Mapa Completo</div>
+  <h1>De cero a <span>Arquitecto IA</span><br>en un solo camino</h1>
+  <p>5 tracks progresivos. Cada uno construye sobre el anterior. Cada módulo termina con un proyecto real que demuestra que aprendiste.</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-n" style="color:var(--t1)">5</div><div class="stat-l">Tracks</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--t2)">42</div><div class="stat-l">Módulos</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--t3)">180+</div><div class="stat-l">Lecciones</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--t4)">28,500</div><div class="stat-l">XP totales</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--t5)">~52 sem</div><div class="stat-l">Contenido</div></div>
+</div>
+
+<!-- Journey -->
+<div class="journey">
+  <div class="jstep" onclick="scrollToTrack('t1')">
+    <div class="jstep-pill t1">🌱 Principiante</div>
+    <div class="jstep-arrow">→</div>
+  </div>
+  <div class="jstep" onclick="scrollToTrack('t2')">
+    <div class="jstep-pill t2">⚡ Intermedio</div>
+    <div class="jstep-arrow">→</div>
+  </div>
+  <div class="jstep" onclick="scrollToTrack('t3')">
+    <div class="jstep-pill t3">🔧 Constructor</div>
+    <div class="jstep-arrow">→</div>
+  </div>
+  <div class="jstep" onclick="scrollToTrack('t4')">
+    <div class="jstep-pill t4">🚀 Avanzado</div>
+    <div class="jstep-arrow">→</div>
+  </div>
+  <div class="jstep" onclick="scrollToTrack('t5')">
+    <div class="jstep-pill t5">🏛️ Arquitecto</div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:#555"></div>Lección teórica</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--t1)"></div>Práctica / Lab</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--t3)"></div>Video educativo</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--t2)"></div>Quiz / Debate</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--t4)"></div>Proyecto real</div>
+</div>
+
+<div class="tracks" id="tracks">
+
+<!-- ══════════════════════════════════════════════════════
+     TRACK 1 — PRINCIPIANTE
+══════════════════════════════════════════════════════ -->
+<div class="track" id="t1" style="border-color:rgba(0,217,176,.2)">
+  <div class="track-header" onclick="toggleTrack('t1')">
+    <div class="track-header-left">
+      <div class="track-icon" style="background:rgba(0,217,176,.12)">🌱</div>
+      <div class="track-info">
+        <div class="track-tag" style="color:var(--t1)">Track 1 · Principiante</div>
+        <div class="track-name">Fundamentos de Inteligencia Artificial</div>
+        <div class="track-desc">Para quien no sabe nada. Al terminar entiendes QUÉ es la IA, CÓMO funciona por dentro, y tienes un mapa mental sólido de todo el ecosistema. Sin código. Sin matemáticas avanzadas.</div>
+        <div class="track-meta">
+          <div class="track-meta-chip" style="background:rgba(0,217,176,.1);color:var(--t1)">⏱ 12 semanas</div>
+          <div class="track-meta-chip" style="background:rgba(0,217,176,.1);color:var(--t1)">8 módulos</div>
+          <div class="track-meta-chip" style="background:rgba(0,217,176,.1);color:var(--t1)">🎬 Videos + Quiz + Proyectos</div>
+          <div class="track-meta-chip" style="background:rgba(0,217,176,.1);color:var(--t1)">🏅 Badge: Fundamentos IA</div>
+        </div>
+      </div>
+    </div>
+    <div class="track-right">
+      <div class="track-xp" style="color:var(--t1)">4,500 <span>XP</span></div>
+      <div class="track-badge" style="background:rgba(0,217,176,.12);color:var(--t1)">Nivel 1 → 10</div>
+      <div class="track-chevron open" id="t1-chev">▾</div>
+    </div>
+  </div>
+  <div class="modules open" id="t1-mods">
+    <div class="track-summary">
+      <div class="ts-item"><div class="ts-num" style="color:var(--t1)">8</div><div class="ts-lbl">Módulos</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t1)">32</div><div class="ts-lbl">Lecciones</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t1)">90min</div><div class="ts-lbl">Por módulo</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t1)">8</div><div class="ts-lbl">Proyectos</div></div>
+    </div>
+    <div class="duration-bar"><div class="duration-fill" style="width:100%;background:linear-gradient(90deg,var(--t1),rgba(0,217,176,.3))"></div></div>
+    <div class="modules-grid">
+      <div class="mod" style="--c:var(--t1)">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t1);border-radius:3px 0 0 3px;"></div>
+        <div class="mod-top"><div class="mod-num" style="background:rgba(0,217,176,.1);color:var(--t1)">M1</div><div class="mod-xp">500 XP · 90 min</div></div>
+        <div class="mod-name">La historia y el presente de la IA</div>
+        <div class="mod-desc">74 años de historia. Las 4 eras. Por qué explotó ahora. Impacto económico real. Los 4 mitos desarmados con evidencia.</div>
+        <div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">📝 3 quizzes</span><span class="mod-chip">⚔️ Debate</span><span class="mod-chip">🧠 Brainstorm</span></div>
+        <div class="mod-duration">🏆 Proyecto: Tu manifiesto de la IA</div>
+      </div>
+      <div class="mod">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t1);border-radius:3px 0 0 3px;"></div>
+        <div class="mod-top"><div class="mod-num" style="background:rgba(0,217,176,.1);color:var(--t1)">M2</div><div class="mod-xp">550 XP · 90 min</div></div>
+        <div class="mod-name">Cómo funciona la IA por dentro</div>
+        <div class="mod-desc">Redes neuronales sin matemáticas. Backpropagation explicado con analogías. Qué son los parámetros. La revolución Transformer de 2017.</div>
+        <div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">📊 Diagrama interactivo</span><span class="mod-chip">📝 Quiz</span></div>
+        <div class="mod-duration">🏆 Proyecto: Explica la IA sin jerga</div>
+      </div>
+      <div class="mod">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t1);border-radius:3px 0 0 3px;"></div>
+        <div class="mod-top"><div class="mod-num" style="background:rgba(0,217,176,.1);color:var(--t1)">M3</div><div class="mod-xp">500 XP · 75 min</div></div>
+        <div class="mod-name">El arte y la ciencia del prompting</div>
+        <div class="mod-desc">Los 7 componentes de un prompt profesional. Chain-of-Thought. Few-Shot. Meta-prompting. Diferencia entre prompt mediocre y excelente.</div>
+        <div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">✍️ Taller en vivo</span><span class="mod-chip">📝 3 ejercicios</span></div>
+        <div class="mod-duration">🏆 Proyecto: Biblioteca de 10 prompts</div>
+      </div>
+      <div class="mod">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t1);border-radius:3px 0 0 3px;"></div>
+        <div class="mod-top"><div class="mod-num" style="background:rgba(0,217,176,.1);color:var(--t1)">M4</div><div class="mod-xp">500 XP · 80 min</div></div>
+        <div class="mod-name">Mapa completo del ecosistema</div>
+        <div class="mod-desc">LLMs, imagen, video, audio, búsqueda, automatización. Cómo evaluar una herramienta. Tu stack personal de productividad con IA.</div>
+        <div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">🗺️ Mapa interactivo</span><span class="mod-chip">⚖️ Comparativas</span></div>
+        <div class="mod-duration">🏆 Proyecto: Tu stack personal documentado</div>
+      </div>
+      <div class="mod">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t1);border-radius:3px 0 0 3px;"></div>
+        <div class="mod-top"><div class="mod-num" style="background:rgba(0,217,176,.1);color:var(--t1)">M5</div><div class="mod-xp">450 XP · 75 min</div></div>
+        <div class="mod-name">IA generativa en profundidad</div>
+        <div class="mod-desc">Imagen, video, audio y música con IA. Cómo funcionan los modelos de difusión. Prompting visual. Casos de uso reales y limitaciones actuales.</div>
+        <div class="mod-chips"><span class="mod-chip">🎬 4 videos</span><span class="mod-chip">🎨 Lab creativo</span><span class="mod-chip">📝 Quiz</span></div>
+        <div class="mod-duration">🏆 Proyecto: Campaña creativa 100% con IA</div>
+      </div>
+      <div class="mod">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t1);border-radius:3px 0 0 3px;"></div>
+        <div class="mod-top"><div class="mod-num" style="background:rgba(0,217,176,.1);color:var(--t1)">M6</div><div class="mod-xp">400 XP · 70 min</div></div>
+        <div class="mod-name">IA, ética y sociedad</div>
+        <div class="mod-desc">Sesgos en IA y cómo detectarlos. Privacidad y datos. Deepfakes y desinformación. Regulación global. El futuro del trabajo — escenarios reales.</div>
+        <div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">⚔️ Debate ético</span><span class="mod-chip">🔍 Análisis de caso</span></div>
+        <div class="mod-duration">🏆 Proyecto: Impacto de IA en tu industria</div>
+      </div>
+      <div class="mod">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t1);border-radius:3px 0 0 3px;"></div>
+        <div class="mod-top"><div class="mod-num" style="background:rgba(0,217,176,.1);color:var(--t1)">M7</div><div class="mod-xp">550 XP · 90 min</div></div>
+        <div class="mod-name">Automatización sin código</div>
+        <div class="mod-desc">Make.com desde cero. Flujos, webhooks, lógica condicional. Conecta Gmail, Notion, WhatsApp, Slack con IA. Tu primer agente de IA básico.</div>
+        <div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">⚙️ Lab Make.com</span><span class="mod-chip">🤖 Agente básico</span></div>
+        <div class="mod-duration">🏆 Proyecto: Automatización que ahorra 3h/semana</div>
+      </div>
+      <div class="mod project" style="border-color:var(--t1)">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t1);border-radius:3px 0 0 3px;"></div>
+        <div class="project-crown">🏆</div>
+        <div class="mod-top"><div class="mod-num" style="background:rgba(0,217,176,.15);color:var(--t1)">M8</div><div class="mod-xp">1,050 XP · Certificación</div></div>
+        <div class="mod-name">Proyecto Final de Certificación</div>
+        <div class="mod-desc">Sistema de IA completo integrando 3+ herramientas. Documentación técnica. Video de 5 min. Evaluación oral con 10 preguntas del tutor IA.</div>
+        <div class="mod-chips"><span class="mod-chip">📄 Documentación</span><span class="mod-chip">🎥 Video demo</span><span class="mod-chip">🎓 Evaluación oral</span></div>
+        <div class="mod-duration">🏅 Certificado: Fundamentos de IA — NeuralMente</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TRACK 2 — INTERMEDIO
+══════════════════════════════════════════════════════ -->
+<div class="track" id="t2" style="border-color:rgba(240,169,53,.2)">
+  <div class="track-header" onclick="toggleTrack('t2')">
+    <div class="track-header-left">
+      <div class="track-icon" style="background:rgba(240,169,53,.12)">⚡</div>
+      <div class="track-info">
+        <div class="track-tag" style="color:var(--t2)">Track 2 · Intermedio</div>
+        <div class="track-name">IA para Negocios y Productividad</div>
+        <div class="track-desc">Para quien ya entiende qué es la IA y quiere aplicarla en su trabajo o negocio. Automatizaciones reales, agentes de ventas, marketing con IA, análisis de datos sin programar.</div>
+        <div class="track-meta">
+          <div class="track-meta-chip" style="background:rgba(240,169,53,.1);color:var(--t2)">⏱ 14 semanas</div>
+          <div class="track-meta-chip" style="background:rgba(240,169,53,.1);color:var(--t2)">9 módulos</div>
+          <div class="track-meta-chip" style="background:rgba(240,169,53,.1);color:var(--t2)">🔒 Requiere Track 1</div>
+          <div class="track-meta-chip" style="background:rgba(240,169,53,.1);color:var(--t2)">🏅 Badge: IA Pro Negocios</div>
+        </div>
+      </div>
+    </div>
+    <div class="track-right">
+      <div class="track-xp" style="color:var(--t2)">5,500 <span>XP</span></div>
+      <div class="track-badge" style="background:rgba(240,169,53,.12);color:var(--t2)">Nivel 10 → 25</div>
+      <div class="track-chevron" id="t2-chev">▾</div>
+    </div>
+  </div>
+  <div class="modules" id="t2-mods">
+    <div class="track-summary">
+      <div class="ts-item"><div class="ts-num" style="color:var(--t2)">9</div><div class="ts-lbl">Módulos</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t2)">38</div><div class="ts-lbl">Lecciones</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t2)">85min</div><div class="ts-lbl">Por módulo</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t2)">9</div><div class="ts-lbl">Proyectos</div></div>
+    </div>
+    <div class="duration-bar"><div class="duration-fill" style="width:100%;background:linear-gradient(90deg,var(--t2),rgba(240,169,53,.3))"></div></div>
+    <div class="modules-grid">
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.1);color:var(--t2)">M1</div><div class="mod-xp">500 XP · 80 min</div></div><div class="mod-name">Diagnóstico IA de tu negocio</div><div class="mod-desc">Framework Impacto vs Esfuerzo. Mapa de procesos. ROI real de implementar IA. Casos por industria: retail, servicios, manufactura.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">📊 Framework</span><span class="mod-chip">📝 Quiz</span></div><div class="mod-duration">🏆 Diagnóstico de tu negocio con 5 oportunidades</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.1);color:var(--t2)">M2</div><div class="mod-xp">600 XP · 90 min</div></div><div class="mod-name">Agente de ventas con IA</div><div class="mod-desc">Configura un agente que califica leads, responde preguntas y da seguimiento 24/7. Integración con WhatsApp Business y CRM.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">🤖 Lab agente</span><span class="mod-chip">📱 WhatsApp</span></div><div class="mod-duration">🏆 Agente de ventas funcionando en tu negocio</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.1);color:var(--t2)">M3</div><div class="mod-xp">500 XP · 80 min</div></div><div class="mod-name">Marketing con IA a escala</div><div class="mod-desc">Contenido en escala. Copy de anuncios. Calendario editorial automático. A/B testing con IA. Análisis de competencia en minutos.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">📱 Lab contenido</span><span class="mod-chip">📊 Analytics</span></div><div class="mod-duration">🏆 1 mes de contenido generado con IA</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.1);color:var(--t2)">M4</div><div class="mod-xp">650 XP · 90 min</div></div><div class="mod-name">Automatización de operaciones</div><div class="mod-desc">Make.com avanzado. Facturación e inventario automático. Atención al cliente con IA. Integración con Shopify y WooCommerce.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">⚙️ 3 Labs</span><span class="mod-chip">🔗 Integraciones</span></div><div class="mod-duration">🏆 Elimina 5h de trabajo manual por semana</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.1);color:var(--t2)">M5</div><div class="mod-xp">550 XP · 85 min</div></div><div class="mod-name">Datos e inteligencia de negocio</div><div class="mod-desc">ChatGPT Advanced Data Analysis. Dashboards sin SQL. Predicción de demanda. Análisis de sentimiento. Reportes automáticos.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">📊 Dashboard live</span><span class="mod-chip">📈 Predicción</span></div><div class="mod-duration">🏆 Dashboard en vivo de tu negocio</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.1);color:var(--t2)">M6</div><div class="mod-xp">450 XP · 70 min</div></div><div class="mod-name">Finanzas con IA</div><div class="mod-desc">Conciliación contable automática. Detección de gastos innecesarios. Proyecciones con 3 escenarios. Reportes para inversores.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">💰 Lab financiero</span><span class="mod-chip">📊 Escenarios</span></div><div class="mod-duration">🏆 Proyección financiera 12 meses con IA</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.1);color:var(--t2)">M7</div><div class="mod-xp">450 XP · 70 min</div></div><div class="mod-name">IA para tu equipo</div><div class="mod-desc">Implementar IA sin resistencia. Capacitación acelerada. Políticas de uso en empresa. KPIs de adopción de IA.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">👥 Taller equipo</span><span class="mod-chip">📋 Políticas</span></div><div class="mod-duration">🏆 Plan de implementación de 90 días</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.1);color:var(--t2)">M8</div><div class="mod-xp">500 XP · 80 min</div></div><div class="mod-name">Atención al cliente con IA</div><div class="mod-desc">Chatbots avanzados. Sistema de tickets inteligente. Escalación automática. Análisis de conversaciones. CSAT automatizado.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">🤖 Lab chatbot</span><span class="mod-chip">📊 Analytics</span></div><div class="mod-duration">🏆 Sistema de soporte IA funcionando</div></div>
+      <div class="mod project" style="border-color:var(--t2)"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t2);border-radius:3px 0 0 3px;"></div><div class="project-crown">🏆</div><div class="mod-top"><div class="mod-num" style="background:rgba(240,169,53,.15);color:var(--t2)">M9</div><div class="mod-xp">1,300 XP · Certificación</div></div><div class="mod-name">Tu empresa IA-first</div><div class="mod-desc">Presentación de 15 min de tu empresa transformada con IA. Dashboard unificado. ROI documentado. Evaluación por el tutor IA.</div><div class="mod-chips"><span class="mod-chip">📊 Dashboard</span><span class="mod-chip">🎤 Presentación</span><span class="mod-chip">🎓 Evaluación</span></div><div class="mod-duration">🏅 Certificado: IA Pro Negocios — NeuralMente</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TRACK 3 — CONSTRUCTOR
+══════════════════════════════════════════════════════ -->
+<div class="track" id="t3" style="border-color:rgba(124,108,252,.2)">
+  <div class="track-header" onclick="toggleTrack('t3')">
+    <div class="track-header-left">
+      <div class="track-icon" style="background:rgba(124,108,252,.12)">🔧</div>
+      <div class="track-info">
+        <div class="track-tag" style="color:var(--t3)">Track 3 · Constructor</div>
+        <div class="track-name">Construye con IA — APIs, RAG y Agentes</div>
+        <div class="track-desc">Para quien quiere construir productos con IA. APIs, RAG, agentes autónomos, fine-tuning básico. Al terminar tienes un micro-SaaS de IA funcionando con usuarios reales.</div>
+        <div class="track-meta">
+          <div class="track-meta-chip" style="background:rgba(124,108,252,.1);color:var(--t3)">⏱ 16 semanas</div>
+          <div class="track-meta-chip" style="background:rgba(124,108,252,.1);color:var(--t3)">10 módulos</div>
+          <div class="track-meta-chip" style="background:rgba(124,108,252,.1);color:var(--t3)">🔒 Requiere Track 1 + 2</div>
+          <div class="track-meta-chip" style="background:rgba(124,108,252,.1);color:var(--t3)">🏅 Badge: Constructor IA</div>
+        </div>
+      </div>
+    </div>
+    <div class="track-right">
+      <div class="track-xp" style="color:var(--t3)">6,500 <span>XP</span></div>
+      <div class="track-badge" style="background:rgba(124,108,252,.12);color:var(--t3)">Nivel 25 → 50</div>
+      <div class="track-chevron" id="t3-chev">▾</div>
+    </div>
+  </div>
+  <div class="modules" id="t3-mods">
+    <div class="track-summary">
+      <div class="ts-item"><div class="ts-num" style="color:var(--t3)">10</div><div class="ts-lbl">Módulos</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t3)">42</div><div class="ts-lbl">Lecciones</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t3)">90min</div><div class="ts-lbl">Por módulo</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t3)">10</div><div class="ts-lbl">Labs de código</div></div>
+    </div>
+    <div class="duration-bar"><div class="duration-fill" style="width:100%;background:linear-gradient(90deg,var(--t3),rgba(124,108,252,.3))"></div></div>
+    <div class="modules-grid">
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M1</div><div class="mod-xp">550 XP · 90 min</div></div><div class="mod-name">APIs de IA desde cero</div><div class="mod-desc">Tu primera llamada a Claude y OpenAI API. Parámetros clave: temperatura, tokens, system prompt. Manejo de errores. Optimización de costos.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">💻 Lab código</span><span class="mod-chip">🚀 Deploy</span></div><div class="mod-duration">🏆 App web con Claude API en Vercel</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M2</div><div class="mod-xp">600 XP · 90 min</div></div><div class="mod-name">RAG — IA con tus documentos</div><div class="mod-desc">Qué es RAG. Embeddings sin matemáticas. Pinecone vs pgvector. Chatbot sobre tus PDFs con LangChain. Evalúa calidad de tu RAG.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">💻 Lab RAG</span><span class="mod-chip">📊 Evaluación</span></div><div class="mod-duration">🏆 Chatbot sobre 50+ documentos propios</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M3</div><div class="mod-xp">650 XP · 95 min</div></div><div class="mod-name">Agentes autónomos</div><div class="mod-desc">LLM vs cadena vs agente. Function calling. Agente con memoria. Agente que navega la web. Multi-agentes especializados.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">🤖 Lab agente</span><span class="mod-chip">🌐 Web scraping</span></div><div class="mod-duration">🏆 Agente que investiga y escribe reportes</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M4</div><div class="mod-xp">550 XP · 85 min</div></div><div class="mod-name">n8n y workflows complejos</div><div class="mod-desc">n8n self-hosted vs cloud. Nodos de IA. Webhooks. Lógica condicional avanzada. Integración con cualquier API. Manejo de errores en producción.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">⚙️ Lab n8n</span><span class="mod-chip">🔗 APIs</span></div><div class="mod-duration">🏆 Workflow que corre 24/7 en producción</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M5</div><div class="mod-xp">600 XP · 90 min</div></div><div class="mod-name">Bases de datos vectoriales</div><div class="mod-desc">Pinecone vs Weaviate vs pgvector vs Qdrant. Indexing: HNSW e IVF. Chunking strategies avanzadas. Búsqueda semántica en producción.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">💻 Benchmark</span><span class="mod-chip">📊 Métricas</span></div><div class="mod-duration">🏆 Benchmark de 3 estrategias de chunking</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M6</div><div class="mod-xp">550 XP · 85 min</div></div><div class="mod-name">Prompt engineering avanzado</div><div class="mod-desc">Fine-tuning vs prompting. Chain-of-thought avanzado. Tree-of-thought. Few-shot vs zero-shot. Evalúa prompts automáticamente.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">✍️ Taller</span><span class="mod-chip">📊 Evals</span></div><div class="mod-duration">🏆 Modelo que clasifica emails con 95%+ precisión</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M7</div><div class="mod-xp">600 XP · 90 min</div></div><div class="mod-name">Deploy en producción</div><div class="mod-desc">Next.js + Vercel + Supabase. Variables de entorno. Monitoring con Langfuse. CI/CD automático. Streaming de respuestas.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">🚀 Deploy</span><span class="mod-chip">📊 Monitoring</span></div><div class="mod-duration">🏆 App en producción con 10+ usuarios reales</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M8</div><div class="mod-xp">500 XP · 80 min</div></div><div class="mod-name">Seguridad y costos en IA</div><div class="mod-desc">Prompt injection. Rate limiting. Caching inteligente que reduce costos 70%. Monitoreo de costos por usuario. Qué hacer cuando la API falla.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">🛡️ Auditoría</span><span class="mod-chip">💰 Optimización</span></div><div class="mod-duration">🏆 Reduce costos 60% en app existente</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.1);color:var(--t3)">M9</div><div class="mod-xp">550 XP · 85 min</div></div><div class="mod-name">Tu primer micro-SaaS de IA</div><div class="mod-desc">Elige tu nicho. MVP en 2 semanas. Landing + Stripe en 1 día. Consigue tus primeros 10 usuarios. Itera con feedback real.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">💳 Stripe</span><span class="mod-chip">📈 GTM</span></div><div class="mod-duration">🏆 SaaS con al menos $1 de ingreso real</div></div>
+      <div class="mod project" style="border-color:var(--t3)"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t3);border-radius:3px 0 0 3px;"></div><div class="project-crown">🏆</div><div class="mod-top"><div class="mod-num" style="background:rgba(124,108,252,.15);color:var(--t3)">M10</div><div class="mod-xp">1,350 XP · Certificación</div></div><div class="mod-name">SaaS de IA en producción</div><div class="mod-desc">Producto funcionando con usuarios reales, monetización, y arquitectura documentada. Evaluación técnica con el tutor IA.</div><div class="mod-chips"><span class="mod-chip">💻 Código</span><span class="mod-chip">📄 Docs</span><span class="mod-chip">🎓 Evaluación técnica</span></div><div class="mod-duration">🏅 Certificado: Constructor IA — NeuralMente</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TRACK 4 — AVANZADO
+══════════════════════════════════════════════════════ -->
+<div class="track" id="t4" style="border-color:rgba(240,99,74,.2)">
+  <div class="track-header" onclick="toggleTrack('t4')">
+    <div class="track-header-left">
+      <div class="track-icon" style="background:rgba(240,99,74,.12)">🚀</div>
+      <div class="track-info">
+        <div class="track-tag" style="color:var(--t4)">Track 4 · Avanzado</div>
+        <div class="track-name">LLMs, Fine-Tuning y Sistemas Complejos</div>
+        <div class="track-desc">Para desarrolladores serios. LLMs desde adentro, fine-tuning con LoRA/QLoRA, arquitecturas de producción, MLOps para IA generativa, multi-agentes complejos.</div>
+        <div class="track-meta">
+          <div class="track-meta-chip" style="background:rgba(240,99,74,.1);color:var(--t4)">⏱ 16 semanas</div>
+          <div class="track-meta-chip" style="background:rgba(240,99,74,.1);color:var(--t4)">8 módulos</div>
+          <div class="track-meta-chip" style="background:rgba(240,99,74,.1);color:var(--t4)">🔒 Requiere Track 3</div>
+          <div class="track-meta-chip" style="background:rgba(240,99,74,.1);color:var(--t4)">🏅 Badge: IA Avanzado</div>
+        </div>
+      </div>
+    </div>
+    <div class="track-right">
+      <div class="track-xp" style="color:var(--t4)">7,000 <span>XP</span></div>
+      <div class="track-badge" style="background:rgba(240,99,74,.12);color:var(--t4)">Nivel 50 → 75</div>
+      <div class="track-chevron" id="t4-chev">▾</div>
+    </div>
+  </div>
+  <div class="modules" id="t4-mods">
+    <div class="track-summary">
+      <div class="ts-item"><div class="ts-num" style="color:var(--t4)">8</div><div class="ts-lbl">Módulos</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t4)">36</div><div class="ts-lbl">Lecciones</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t4)">100min</div><div class="ts-lbl">Por módulo</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t4)">8</div><div class="ts-lbl">Proyectos técnicos</div></div>
+    </div>
+    <div class="duration-bar"><div class="duration-fill" style="width:100%;background:linear-gradient(90deg,var(--t4),rgba(240,99,74,.3))"></div></div>
+    <div class="modules-grid">
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t4);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,99,74,.1);color:var(--t4)">M1</div><div class="mod-xp">700 XP · 100 min</div></div><div class="mod-name">LLMs desde adentro</div><div class="mod-desc">Arquitectura Transformer profunda. Tokenización. Pre-entrenamiento vs RLHF. Chinchilla laws. Benchmarks reales: MMLU, HumanEval.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">💻 PyTorch</span><span class="mod-chip">📊 Benchmarks</span></div><div class="mod-duration">🏆 Transformer mini en PyTorch</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t4);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,99,74,.1);color:var(--t4)">M2</div><div class="mod-xp">800 XP · 110 min</div></div><div class="mod-name">Arquitecturas de sistemas IA</div><div class="mod-desc">Patrones avanzados: RAG, re-ranking, HyDE. ReAct, Plan-and-Execute. Caching semántico. Sistemas tolerantes a fallos. Diseño a escala.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">🏗️ Arquitectura</span><span class="mod-chip">⚡ Performance</span></div><div class="mod-duration">🏆 Sistema RAG que maneja 1,000 consultas/hora</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t4);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,99,74,.1);color:var(--t4)">M3</div><div class="mod-xp">800 XP · 105 min</div></div><div class="mod-name">Fine-tuning avanzado y PEFT</div><div class="mod-desc">LoRA y QLoRA. Dataset curation. Entrenamiento con Axolotl en RunPod. Anti-overfitting. Merging de modelos: SLERP, TIES, DARE.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">🔬 Lab GPU</span><span class="mod-chip">🤗 HuggingFace</span></div><div class="mod-duration">🏆 Llama fine-tuneado en tu dominio</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t4);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,99,74,.1);color:var(--t4)">M4</div><div class="mod-xp">900 XP · 110 min</div></div><div class="mod-name">Multi-agentes complejos</div><div class="mod-desc">LangGraph, CrewAI, AutoGen comparados. Memoria episódica. Herramientas personalizadas. Orquestación supervisor + especialistas. Debugging de agentes.</div><div class="mod-chips"><span class="mod-chip">🎬 3 videos</span><span class="mod-chip">🤖 Lab multi-agente</span><span class="mod-chip">🐛 Debug</span></div><div class="mod-duration">🏆 Pipeline multi-agente de investigación</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t4);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,99,74,.1);color:var(--t4)">M5</div><div class="mod-xp">700 XP · 95 min</div></div><div class="mod-name">MLOps para IA generativa</div><div class="mod-desc">Langfuse y Helicone. Evals automáticos LLM-as-judge. Feature flags para modelos. A/B testing. Pipelines de re-entrenamiento.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">📊 Observabilidad</span><span class="mod-chip">🔄 CI/CD</span></div><div class="mod-duration">🏆 Pipeline de evals que bloquea regresiones</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t4);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,99,74,.1);color:var(--t4)">M6</div><div class="mod-xp">650 XP · 90 min</div></div><div class="mod-name">Optimización de costos y latencia</div><div class="mod-desc">Prompt caching avanzado. Routing inteligente. Quantización: GGUF, GPTQ. Batching para máximo throughput. Speculative decoding.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">💰 Optimización</span><span class="mod-chip">⚡ Latencia</span></div><div class="mod-duration">🏆 Reduce costos 60% documentando cada técnica</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t4);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(240,99,74,.1);color:var(--t4)">M7</div><div class="mod-xp">650 XP · 90 min</div></div><div class="mod-name">IA en el edge y dispositivos</div><div class="mod-desc">Modelos locales con Ollama. LLMs en móvil. WebLLM en el browser. Privacidad total. Casos de uso offline. Comparativa cloud vs edge.</div><div class="mod-chips"><span class="mod-chip">🎬 2 videos</span><span class="mod-chip">📱 Lab mobile</span><span class="mod-chip">🌐 WebLLM</span></div><div class="mod-duration">🏆 App con LLM local sin internet</div></div>
+      <div class="mod project" style="border-color:var(--t4)"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t4);border-radius:3px 0 0 3px;"></div><div class="project-crown">🏆</div><div class="mod-top"><div class="mod-num" style="background:rgba(240,99,74,.15);color:var(--t4)">M8</div><div class="mod-xp">1,800 XP · Certificación</div></div><div class="mod-name">Sistema IA en producción real</div><div class="mod-desc">Sistema completo con arquitectura documentada, evals automáticos, monitoring, y 100+ usuarios reales. Demo en vivo ante el tutor.</div><div class="mod-chips"><span class="mod-chip">💻 Sistema</span><span class="mod-chip">📄 Arquitectura</span><span class="mod-chip">🎓 Demo en vivo</span></div><div class="mod-duration">🏅 Certificado: IA Avanzado — NeuralMente</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TRACK 5 — ARQUITECTO MASTER
+══════════════════════════════════════════════════════ -->
+<div class="track" id="t5" style="border-color:rgba(74,144,226,.2)">
+  <div class="track-header" onclick="toggleTrack('t5')">
+    <div class="track-header-left">
+      <div class="track-icon" style="background:rgba(74,144,226,.12)">🏛️</div>
+      <div class="track-info">
+        <div class="track-tag" style="color:var(--t5)">Track 5 · Arquitecto Master</div>
+        <div class="track-name">Diseña el Futuro — Arquitectura e Investigación IA</div>
+        <div class="track-desc">El nivel más alto. Diseñas sistemas de IA a escala empresarial, lideras equipos de IA, y contribuyes al campo. Para quienes quieren estar en la frontera de la IA.</div>
+        <div class="track-meta">
+          <div class="track-meta-chip" style="background:rgba(74,144,226,.1);color:var(--t5)">⏱ 10 semanas</div>
+          <div class="track-meta-chip" style="background:rgba(74,144,226,.1);color:var(--t5)">7 módulos</div>
+          <div class="track-meta-chip" style="background:rgba(74,144,226,.1);color:var(--t5)">🔒 Requiere todos los tracks</div>
+          <div class="track-meta-chip" style="background:rgba(74,144,226,.1);color:var(--t5)">🏅 Badge: Arquitecto IA Master</div>
+        </div>
+      </div>
+    </div>
+    <div class="track-right">
+      <div class="track-xp" style="color:var(--t5)">5,000 <span>XP</span></div>
+      <div class="track-badge" style="background:rgba(74,144,226,.12);color:var(--t5)">Nivel 75 → 100</div>
+      <div class="track-chevron" id="t5-chev">▾</div>
+    </div>
+  </div>
+  <div class="modules" id="t5-mods">
+    <div class="track-summary">
+      <div class="ts-item"><div class="ts-num" style="color:var(--t5)">7</div><div class="ts-lbl">Módulos</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t5)">28</div><div class="ts-lbl">Lecciones</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t5)">120min</div><div class="ts-lbl">Por módulo</div></div>
+      <div class="ts-item"><div class="ts-num" style="color:var(--t5)">7</div><div class="ts-lbl">Proyectos senior</div></div>
+    </div>
+    <div class="duration-bar"><div class="duration-fill" style="width:100%;background:linear-gradient(90deg,var(--t5),rgba(74,144,226,.3))"></div></div>
+    <div class="modules-grid">
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t5);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(74,144,226,.1);color:var(--t5)">M1</div><div class="mod-xp">600 XP · 110 min</div></div><div class="mod-name">Diseño de sistemas IA a escala</div><div class="mod-desc">Arquitecturas para millones de usuarios. Sharding, caching distribuido, load balancing para LLMs. Disaster recovery. Cost modeling a escala.</div><div class="mod-chips"><span class="mod-chip">🏗️ Arquitectura</span><span class="mod-chip">📊 Modeling</span><span class="mod-chip">⚡ Scale</span></div><div class="mod-duration">🏆 Diseño de arquitectura para 1M usuarios</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t5);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(74,144,226,.1);color:var(--t5)">M2</div><div class="mod-xp">700 XP · 120 min</div></div><div class="mod-name">Investigación aplicada en IA</div><div class="mod-desc">Cómo leer papers de IA. Reproducir resultados. Contribuir a proyectos open source. Publicar tus propios findings. Arxiv y comunidad.</div><div class="mod-chips"><span class="mod-chip">📄 Papers</span><span class="mod-chip">🔬 Research</span><span class="mod-chip">🌐 Open source</span></div><div class="mod-duration">🏆 Contribución real a proyecto open source</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t5);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(74,144,226,.1);color:var(--t5)">M3</div><div class="mod-xp">650 XP · 110 min</div></div><div class="mod-name">Liderazgo de equipos de IA</div><div class="mod-desc">Cómo contratar ingenieros de IA. Cultura de experimentación. Gestión de proyectos de ML. ROI y comunicación con stakeholders no técnicos.</div><div class="mod-chips"><span class="mod-chip">👥 Liderazgo</span><span class="mod-chip">📊 ROI</span><span class="mod-chip">🗣️ Comunicación</span></div><div class="mod-duration">🏆 Plan de equipo de IA para empresa real</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t5);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(74,144,226,.1);color:var(--t5)">M4</div><div class="mod-xp">700 XP · 120 min</div></div><div class="mod-name">IA en producción a escala empresarial</div><div class="mod-desc">Governance de modelos. Compliance y regulación. Auditoría de IA. Risk management. Vendor lock-in strategy. Enterprise deployment.</div><div class="mod-chips"><span class="mod-chip">🏢 Enterprise</span><span class="mod-chip">⚖️ Compliance</span><span class="mod-chip">🛡️ Risk</span></div><div class="mod-duration">🏆 Framework de governance para empresa</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t5);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(74,144,226,.1);color:var(--t5)">M5</div><div class="mod-xp">600 XP · 110 min</div></div><div class="mod-name">El futuro de la IA — AGI y más allá</div><div class="mod-desc">Estado actual hacia AGI. Alignment y seguridad. Modelos multimodales del futuro. Robótica con IA. Computación cuántica e IA.</div><div class="mod-chips"><span class="mod-chip">🔮 Futurismo</span><span class="mod-chip">🤖 AGI</span><span class="mod-chip">⚛️ Quantum</span></div><div class="mod-duration">🏆 Análisis de tendencias y positioning estratégico</div></div>
+      <div class="mod"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t5);border-radius:3px 0 0 3px;"></div><div class="mod-top"><div class="mod-num" style="background:rgba(74,144,226,.1);color:var(--t5)">M6</div><div class="mod-xp">550 XP · 100 min</div></div><div class="mod-name">Construye tu marca en IA</div><div class="mod-desc">Cómo posicionarte como experto en IA. Contenido técnico que atrae oportunidades. Hablar en conferencias. Consultoría de IA. Network estratégico.</div><div class="mod-chips"><span class="mod-chip">📢 Personal brand</span><span class="mod-chip">✍️ Contenido</span><span class="mod-chip">🤝 Network</span></div><div class="mod-duration">🏆 Portfolio público de IA con 1,000+ vistas</div></div>
+      <div class="mod project" style="border-color:var(--t5)"><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--t5);border-radius:3px 0 0 3px;"></div><div class="project-crown">👑</div><div class="mod-top"><div class="mod-num" style="background:rgba(74,144,226,.15);color:var(--t5)">M7</div><div class="mod-xp">1,200 XP · Certificación Master</div></div><div class="mod-name">Proyecto Capstone — Tu legado en IA</div><div class="mod-desc">El proyecto más importante de tu carrera en IA. Sistema real que resuelve un problema de alto impacto. Presentación ante panel de expertos.</div><div class="mod-chips"><span class="mod-chip">🌍 Impacto real</span><span class="mod-chip">👥 Panel de expertos</span><span class="mod-chip">👑 Certificación</span></div><div class="mod-duration">👑 Certificado Master: Arquitecto IA — NeuralMente</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /tracks -->
+
+<!-- TOTAL SUMMARY -->
+<div class="total-card">
+  <div class="total-title">Resumen completo de la academia</div>
+  <div class="total-grid">
+    <div class="total-item"><div class="total-n" style="color:var(--t1)">42</div><div class="total-l">Módulos totales</div></div>
+    <div class="total-item"><div class="total-n" style="color:var(--t3)">180+</div><div class="total-l">Lecciones y videos</div></div>
+    <div class="total-item"><div class="total-n" style="color:var(--t2)">~52</div><div class="total-l">Semanas de contenido</div></div>
+    <div class="total-item"><div class="total-n" style="color:var(--t4)">28,500</div><div class="total-l">XP totales</div></div>
+    <div class="total-item"><div class="total-n" style="color:var(--t5)">5</div><div class="total-l">Certificaciones</div></div>
+    <div class="total-item"><div class="total-n" style="color:var(--am)">42</div><div class="total-l">Proyectos reales</div></div>
+  </div>
+  <div class="total-desc">A $49/mes, un alumno que complete los 5 tracks habrá invertido ~13 meses de aprendizaje estructurado y construido 42 proyectos reales. El valor entregado es 10-20x el precio de la suscripción — eso es lo que hace que la gente se quede y refiera.</div>
+</div>
+
+<script>
+function toggleTrack(id){
+  const mods=document.getElementById(`${id}-mods`);
+  const chev=document.getElementById(`${id}-chev`);
+  const isOpen=mods.classList.contains('open');
+  mods.classList.toggle('open',!isOpen);
+  chev.classList.toggle('open',!isOpen);
+}
+function scrollToTrack(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+  // auto-open
+  const mods=document.getElementById(`${id}-mods`);
+  const chev=document.getElementById(`${id}-chev`);
+  if(!mods.classList.contains('open')){mods.classList.add('open');chev.classList.add('open');}
+}
+</script>
+</body>
+</html>

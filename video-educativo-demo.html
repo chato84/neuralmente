@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuralMente — Video Educativo Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--s1:#0d1117;--s2:#131b24;
+  --tx:#e8e6f0;--tx2:#8b8a9b;--tx3:#4a4958;
+  --teal:#00d9b0;--pu:#7c6cfc;--am:#f0a935;--co:#f0634a;--bl:#4a90e2;
+}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Outfit',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+
+/* ── SHELL ── */
+.shell{width:100%;max-width:860px;padding:16px;}
+
+.top-label{text-align:center;margin-bottom:12px;}
+.top-label h1{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:3px;}
+.top-label p{font-size:12px;color:var(--tx2);}
+
+/* ── VIDEO PLAYER ── */
+.player{background:#000;border-radius:16px;overflow:hidden;position:relative;aspect-ratio:16/9;box-shadow:0 24px 80px rgba(0,0,0,.7);}
+
+/* Scene canvas */
+.scene{position:absolute;inset:0;display:none;}
+.scene.active{display:flex;align-items:center;justify-content:center;}
+
+/* ── SCENE STYLES ── */
+
+/* Scene 1 — Intro */
+.s1-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(124,108,252,.15),transparent 70%),radial-gradient(ellipse 50% 40% at 80% 20%,rgba(0,217,176,.08),transparent 60%),#07090f;}
+.s1-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(124,108,252,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(124,108,252,.05) 1px,transparent 1px);background-size:40px 40px;}
+.s1-content{position:relative;text-align:center;z-index:1;}
+.s1-question{font-family:'Outfit',sans-serif;font-size:clamp(24px,4vw,48px);font-weight:900;letter-spacing:-1.5px;line-height:1.1;opacity:0;transform:translateY(20px);transition:all .8s cubic-bezier(.34,1.2,.64,1);}
+.s1-question.show{opacity:1;transform:translateY(0);}
+.s1-year{font-size:clamp(10px,1.5vw,14px);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tx2);margin-top:8px;opacity:0;transition:opacity .6s .4s;}
+.s1-question.show + .s1-year{opacity:1;}
+.s1-turing{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:8px 18px;margin-top:16px;font-size:clamp(10px,1.5vw,13px);color:var(--tx2);opacity:0;transition:opacity .6s .8s;}
+.s1-question.show ~ .s1-turing{opacity:1;}
+.s1-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#555,#888);display:flex;align-items:center;justify-content:center;font-size:12px;}
+
+/* Scene 2 — Brain comparison */
+.s2-bg{position:absolute;inset:0;background:#07090f;}
+.s2-content{position:relative;z-index:1;width:100%;padding:0 5%;}
+.s2-title{font-size:clamp(12px,2vw,18px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--am);text-align:center;margin-bottom:clamp(12px,2vw,24px);opacity:0;transition:opacity .5s;}
+.s2-title.show{opacity:1;}
+.s2-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(8px,2vw,20px);align-items:center;}
+.s2-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:clamp(10px,2vw,20px);opacity:0;transform:translateX(-20px);transition:all .6s cubic-bezier(.34,1.2,.64,1);}
+.s2-card.right{transform:translateX(20px);}
+.s2-card.show{opacity:1;transform:translateX(0);}
+.s2-card-icon{font-size:clamp(24px,4vw,44px);text-align:center;margin-bottom:8px;}
+.s2-card-title{font-size:clamp(11px,1.5vw,15px);font-weight:700;margin-bottom:8px;text-align:center;}
+.s2-stat{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:clamp(9px,1.2vw,12px);}
+.s2-stat:last-child{border:none;}
+.s2-stat-key{color:var(--tx2);}
+.s2-stat-val{font-weight:600;font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.1vw,11px);}
+.s2-vs{font-size:clamp(14px,2.5vw,24px);font-weight:900;color:var(--tx3);text-align:center;opacity:0;transition:opacity .5s .4s;}
+.s2-vs.show{opacity:1;}
+
+/* Scene 3 — 4 eras timeline animated */
+.s3-bg{position:absolute;inset:0;background:linear-gradient(180deg,#07090f,#0a0d14);}
+.s3-content{position:relative;z-index:1;width:100%;padding:0 6%;}
+.s3-title{font-size:clamp(12px,1.8vw,18px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--pu);text-align:center;margin-bottom:clamp(10px,2vw,20px);opacity:0;transition:opacity .5s;}
+.s3-title.show{opacity:1;}
+.s3-eras{display:flex;gap:clamp(6px,1.5vw,12px);}
+.era{flex:1;border-radius:10px;overflow:hidden;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.2,.64,1);}
+.era.show{opacity:1;transform:translateY(0);}
+.era-head{padding:clamp(6px,1.2vw,10px) clamp(8px,1.5vw,12px);font-size:clamp(16px,2.5vw,28px);text-align:center;}
+.era-icon{font-size:clamp(18px,3vw,32px);text-align:center;margin-bottom:4px;}
+.era-name{font-size:clamp(8px,1.2vw,12px);font-weight:700;text-align:center;letter-spacing:.04em;}
+.era-years{font-size:clamp(7px,1vw,10px);text-align:center;opacity:.6;margin-top:2px;}
+.era-lesson{padding:clamp(4px,1vw,8px) clamp(6px,1.2vw,10px);font-size:clamp(7px,1vw,10px);line-height:1.4;text-align:center;}
+
+/* Scene 4 — 3 ingredients */
+.s4-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(0,217,176,.06),transparent 70%),#07090f;}
+.s4-content{position:relative;z-index:1;width:90%;text-align:center;}
+.s4-title{font-size:clamp(12px,1.8vw,18px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin-bottom:clamp(10px,2vw,20px);opacity:0;transition:opacity .5s;}
+.s4-title.show{opacity:1;}
+.s4-ingr{display:flex;gap:clamp(8px,2vw,16px);justify-content:center;}
+.ingr{flex:1;max-width:220px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:clamp(12px,2vw,20px);opacity:0;transform:scale(.9);transition:all .5s cubic-bezier(.34,1.2,.64,1);}
+.ingr.show{opacity:1;transform:scale(1);}
+.ingr-icon{font-size:clamp(24px,4vw,44px);margin-bottom:8px;}
+.ingr-num{font-family:'JetBrains Mono',monospace;font-size:clamp(28px,5vw,56px);font-weight:900;line-height:1;margin-bottom:4px;}
+.ingr-label{font-size:clamp(11px,1.5vw,15px);font-weight:700;margin-bottom:4px;}
+.ingr-sub{font-size:clamp(9px,1.2vw,11px);color:var(--tx2);line-height:1.4;}
+.s4-arrow{font-size:clamp(14px,2.5vw,24px);color:var(--tx3);align-self:center;opacity:0;transition:opacity .4s .3s;}
+.s4-arrow.show{opacity:1;}
+
+/* Scene 5 — Economic impact */
+.s5-bg{position:absolute;inset:0;background:#07090f;}
+.s5-content{position:relative;z-index:1;width:88%;}
+.s5-title{font-size:clamp(12px,1.8vw,18px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--am);text-align:center;margin-bottom:clamp(10px,2vw,20px);opacity:0;transition:opacity .5s;}
+.s5-title.show{opacity:1;}
+.s5-bars{display:flex;flex-direction:column;gap:clamp(8px,1.5vw,14px);}
+.s5-bar-item{display:flex;align-items:center;gap:clamp(8px,1.5vw,12px);opacity:0;transform:translateX(-16px);transition:all .5s cubic-bezier(.34,1.2,.64,1);}
+.s5-bar-item.show{opacity:1;transform:translateX(0);}
+.s5-bar-label{font-size:clamp(9px,1.2vw,12px);color:var(--tx2);white-space:nowrap;width:clamp(60px,10vw,110px);text-align:right;flex-shrink:0;}
+.s5-bar-track{flex:1;height:clamp(18px,3vw,32px);background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden;position:relative;}
+.s5-bar-fill{height:100%;border-radius:6px;width:0%;transition:width 1.2s cubic-bezier(.25,.46,.45,.94) .2s;display:flex;align-items:center;padding:0 8px;}
+.s5-bar-val{font-size:clamp(10px,1.3vw,13px);font-weight:700;white-space:nowrap;}
+
+/* Scene 6 — Myth buster */
+.s6-bg{position:absolute;inset:0;background:#07090f;}
+.s6-content{position:relative;z-index:1;width:88%;}
+.s6-title{font-size:clamp(12px,1.8vw,18px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--co);text-align:center;margin-bottom:clamp(10px,2vw,16px);opacity:0;transition:opacity .5s;}
+.s6-title.show{opacity:1;}
+.myth-cards{display:flex;flex-direction:column;gap:clamp(6px,1.2vw,10px);}
+.myth{display:flex;align-items:center;gap:clamp(8px,1.5vw,14px);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:clamp(8px,1.5vw,14px);opacity:0;transform:translateY(10px);transition:all .4s cubic-bezier(.34,1.2,.64,1);}
+.myth.show{opacity:1;transform:translateY(0);}
+.myth-x{width:clamp(22px,3.5vw,36px);height:clamp(22px,3.5vw,36px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(11px,1.8vw,18px);flex-shrink:0;}
+.myth-body{flex:1;}
+.myth-claim{font-size:clamp(9px,1.3vw,13px);font-weight:600;margin-bottom:3px;text-decoration:line-through;opacity:.6;}
+.myth-truth{font-size:clamp(8px,1.1vw,11px);color:var(--teal);font-weight:500;}
+
+/* ── CONTROLS ── */
+.controls{margin-top:12px;display:flex;align-items:center;gap:10px;}
+.progress-wrap{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:99px;cursor:pointer;position:relative;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--pu));border-radius:99px;transition:width .1s linear;}
+.chapter-dots{position:absolute;top:50%;transform:translateY(-50%);display:flex;gap:0;width:100%;}
+.ch-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transform:translate(-50%,-50%);cursor:pointer;transition:background .2s;}
+.ch-dot.passed{background:var(--teal);}
+.ctrl-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;}
+.ctrl-btn:hover{background:rgba(255,255,255,.15);}
+.time-label{font-size:12px;color:var(--tx2);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+.scene-label{font-size:11px;color:var(--tx2);white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;}
+
+/* Narration bar */
+.narration{margin-top:10px;background:var(--s2);border-radius:10px;padding:10px 14px;min-height:52px;display:flex;align-items:center;gap:10px;}
+.nar-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--pu),var(--teal));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.nar-text{font-size:13px;line-height:1.5;color:var(--tx);flex:1;}
+.nar-wave{display:flex;gap:2px;align-items:center;flex-shrink:0;}
+.wave-bar{width:3px;background:var(--teal);border-radius:99px;animation:wave 1s ease infinite;}
+.wave-bar:nth-child(1){height:6px;animation-delay:0s;}
+.wave-bar:nth-child(2){height:12px;animation-delay:.15s;}
+.wave-bar:nth-child(3){height:8px;animation-delay:.3s;}
+.wave-bar:nth-child(4){height:14px;animation-delay:.1s;}
+.wave-bar:nth-child(5){height:6px;animation-delay:.25s;}
+@keyframes wave{0%,100%{transform:scaleY(1);}50%{transform:scaleY(.4);}}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="top-label">
+    <h1>NeuralMente · Video Educativo</h1>
+    <p>Módulo 1 — La Historia y el Presente de la IA · Demo de producción</p>
+  </div>
+
+  <div class="player" id="player">
+
+    <!-- SCENE 1 — La pregunta que cambió todo -->
+    <div class="scene active" id="s1">
+      <div class="s1-bg"></div>
+      <div class="s1-grid"></div>
+      <div class="s1-content">
+        <div class="s1-question" id="s1q">¿Puede una<br>máquina pensar?</div>
+        <div class="s1-year">La pregunta que inició todo</div>
+        <div class="s1-turing">
+          <div class="s1-av">👤</div>
+          <span>Alan Turing · Matemático británico · 1950</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 2 — Cerebro vs Red Neuronal -->
+    <div class="scene" id="s2">
+      <div class="s2-bg"></div>
+      <div class="s2-content">
+        <div class="s2-title" id="s2t">Cerebro humano vs Red neuronal artificial</div>
+        <div class="s2-grid">
+          <div class="s2-card" id="s2c1">
+            <div class="s2-card-icon">🧠</div>
+            <div class="s2-card-title" style="color:var(--bl)">Cerebro humano</div>
+            <div class="s2-stat"><span class="s2-stat-key">Neuronas</span><span class="s2-stat-val" style="color:var(--bl)">86 mil M</span></div>
+            <div class="s2-stat"><span class="s2-stat-key">Consumo</span><span class="s2-stat-val" style="color:var(--bl)">~20W</span></div>
+            <div class="s2-stat"><span class="s2-stat-key">Aprendizaje</span><span class="s2-stat-val" style="color:var(--bl)">Décadas</span></div>
+            <div class="s2-stat"><span class="s2-stat-key">Conciencia</span><span class="s2-stat-val" style="color:var(--bl)">Sí (?)</span></div>
+          </div>
+          <div class="s2-vs" id="s2vs">VS</div>
+          <div class="s2-card right" id="s2c2">
+            <div class="s2-card-icon">🤖</div>
+            <div class="s2-card-title" style="color:var(--teal)">Red neuronal (GPT-4)</div>
+            <div class="s2-stat"><span class="s2-stat-key">Parámetros</span><span class="s2-stat-val" style="color:var(--teal)">1.8 billones</span></div>
+            <div class="s2-stat"><span class="s2-stat-key">Consumo</span><span class="s2-stat-val" style="color:var(--teal)">Megawatts</span></div>
+            <div class="s2-stat"><span class="s2-stat-key">Aprendizaje</span><span class="s2-stat-val" style="color:var(--teal)">Semanas</span></div>
+            <div class="s2-stat"><span class="s2-stat-key">Conciencia</span><span class="s2-stat-val" style="color:var(--teal)">No</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 3 — 4 Eras -->
+    <div class="scene" id="s3">
+      <div class="s3-bg"></div>
+      <div class="s3-content">
+        <div class="s3-title" id="s3t">Las 4 eras de la Inteligencia Artificial</div>
+        <div class="s3-eras">
+          <div class="era" id="e1" style="border:1px solid rgba(74,144,226,.3)">
+            <div class="era-head" style="background:rgba(74,144,226,.12)">
+              <div class="era-icon">🕯️</div>
+              <div class="era-name" style="color:var(--bl)">El optimismo</div>
+              <div class="era-years">1950 — 1970</div>
+            </div>
+            <div class="era-lesson" style="color:rgba(232,230,240,.6);font-size:clamp(7px,1vw,10px)">Promesas imposibles. Presupuestos cortados. La IA es más difícil de lo que parece.</div>
+          </div>
+          <div class="era" id="e2" style="border:1px solid rgba(240,99,74,.3)">
+            <div class="era-head" style="background:rgba(240,99,74,.12)">
+              <div class="era-icon">❄️</div>
+              <div class="era-name" style="color:var(--co)">Los inviernos</div>
+              <div class="era-years">1970 — 1990</div>
+            </div>
+            <div class="era-lesson" style="color:rgba(232,230,240,.6);font-size:clamp(7px,1vw,10px)">Las reglas no escalan. El mundo real es demasiado complejo.</div>
+          </div>
+          <div class="era" id="e3" style="border:1px solid rgba(240,169,53,.3)">
+            <div class="era-head" style="background:rgba(240,169,53,.12)">
+              <div class="era-icon">⚙️</div>
+              <div class="era-name" style="color:var(--am)">Machine Learning</div>
+              <div class="era-years">1990 — 2012</div>
+            </div>
+            <div class="era-lesson" style="color:rgba(232,230,240,.6);font-size:clamp(7px,1vw,10px)">Aprender de datos > programar reglas. Google, Amazon, Netflix.</div>
+          </div>
+          <div class="era" id="e4" style="border:1px solid rgba(0,217,176,.3)">
+            <div class="era-head" style="background:rgba(0,217,176,.12)">
+              <div class="era-icon">🚀</div>
+              <div class="era-name" style="color:var(--teal)">Deep Learning</div>
+              <div class="era-years">2012 — HOY</div>
+            </div>
+            <div class="era-lesson" style="color:rgba(232,230,240,.6);font-size:clamp(7px,1vw,10px)">Transformers (2017). ChatGPT. 100M usuarios en 2 meses.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 4 — 3 ingredientes -->
+    <div class="scene" id="s4">
+      <div class="s4-bg"></div>
+      <div class="s4-content">
+        <div class="s4-title" id="s4t">¿Por qué explotó la IA después de 2012?</div>
+        <div class="s4-ingr">
+          <div class="ingr" id="i1" style="border-color:rgba(74,144,226,.3)">
+            <div class="ingr-icon">📊</div>
+            <div class="ingr-num" style="color:var(--bl)">120</div>
+            <div class="ingr-label">Zettabytes de datos</div>
+            <div class="ingr-sub">Internet generó el combustible que la IA necesitaba</div>
+          </div>
+          <div class="s4-arrow" id="a1">+</div>
+          <div class="ingr" id="i2" style="border-color:rgba(124,108,252,.3)">
+            <div class="ingr-icon">💻</div>
+            <div class="ingr-num" style="color:var(--pu)">10x</div>
+            <div class="ingr-label">Más barato c/3 años</div>
+            <div class="ingr-sub">GPUs de videojuegos, perfectas para IA</div>
+          </div>
+          <div class="s4-arrow" id="a2">+</div>
+          <div class="ingr" id="i3" style="border-color:rgba(0,217,176,.3)">
+            <div class="ingr-icon">🧮</div>
+            <div class="ingr-num" style="color:var(--teal)">2017</div>
+            <div class="ingr-label">Transformers</div>
+            <div class="ingr-sub">"Attention is All You Need" — lo que hace posible ChatGPT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 5 — Impacto económico -->
+    <div class="scene" id="s5">
+      <div class="s5-bg"></div>
+      <div class="s5-content">
+        <div class="s5-title" id="s5t">El impacto económico real de la IA</div>
+        <div class="s5-bars">
+          <div class="s5-bar-item" id="b1">
+            <div class="s5-bar-label">Mercado 2021</div>
+            <div class="s5-bar-track"><div class="s5-bar-fill" id="bf1" style="background:rgba(74,144,226,.6);"><span class="s5-bar-val">$87 mil millones</span></div></div>
+          </div>
+          <div class="s5-bar-item" id="b2">
+            <div class="s5-bar-label">Mercado 2023</div>
+            <div class="s5-bar-track"><div class="s5-bar-fill" id="bf2" style="background:rgba(124,108,252,.7);"><span class="s5-bar-val">$196 mil millones</span></div></div>
+          </div>
+          <div class="s5-bar-item" id="b3">
+            <div class="s5-bar-label">Proyección 2030</div>
+            <div class="s5-bar-track"><div class="s5-bar-fill" id="bf3" style="background:linear-gradient(90deg,var(--teal),var(--pu));"><span class="s5-bar-val">$1.8 trillones</span></div></div>
+          </div>
+          <div class="s5-bar-item" id="b4">
+            <div class="s5-bar-label">Salario +IA vs sin IA</div>
+            <div class="s5-bar-track"><div class="s5-bar-fill" id="bf4" style="background:rgba(240,169,53,.7);"><span class="s5-bar-val">+40 a 60% más</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 6 — Mitos -->
+    <div class="scene" id="s6">
+      <div class="s6-bg"></div>
+      <div class="s6-content">
+        <div class="s6-title" id="s6t">Los 4 mitos que frenan a la mayoría</div>
+        <div class="myth-cards">
+          <div class="myth" id="m1">
+            <div class="myth-x" style="background:rgba(240,99,74,.15)">❌</div>
+            <div class="myth-body">
+              <div class="myth-claim">"La IA va a reemplazar todos los trabajos"</div>
+              <div class="myth-truth">✅ Reemplaza TAREAS, no personas. Quien usa IA reemplaza a quien no la usa.</div>
+            </div>
+          </div>
+          <div class="myth" id="m2">
+            <div class="myth-x" style="background:rgba(240,99,74,.15)">❌</div>
+            <div class="myth-body">
+              <div class="myth-claim">"La IA siempre dice la verdad"</div>
+              <div class="myth-truth">✅ Los LLMs "alucinan" — generan texto plausible pero falso. Siempre verifica.</div>
+            </div>
+          </div>
+          <div class="myth" id="m3">
+            <div class="myth-x" style="background:rgba(240,99,74,.15)">❌</div>
+            <div class="myth-body">
+              <div class="myth-claim">"Necesitas programar para usar IA"</div>
+              <div class="myth-truth">✅ Las mejores herramientas hoy funcionan en lenguaje natural. Cero código.</div>
+            </div>
+          </div>
+          <div class="myth" id="m4">
+            <div class="myth-x" style="background:rgba(240,99,74,.15)">❌</div>
+            <div class="myth-body">
+              <div class="myth-claim">"La IA ya es consciente y tiene sentimientos"</div>
+              <div class="myth-truth">✅ Los LLMs son predictores estadísticos de texto. No hay evidencia de conciencia.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /player -->
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="ctrl-btn" id="play-btn" onclick="togglePlay()">
+      <svg id="play-icon" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 1l9 5-9 5V1z" fill="white"/></svg>
+    </div>
+    <div class="time-label" id="time-lbl">0:00 / 2:30</div>
+    <div class="progress-wrap" id="prog-wrap" onclick="seekTo(event)">
+      <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+      <div class="chapter-dots" id="ch-dots"></div>
+    </div>
+    <div class="scene-label" id="scene-lbl">Escena 1 de 6</div>
+  </div>
+
+  <!-- Narration -->
+  <div class="narration">
+    <div class="nar-av">🎙️</div>
+    <div class="nar-text" id="nar-text">Presiona play para comenzar el video...</div>
+    <div class="nar-wave" id="nar-wave" style="display:none">
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── SCENES ──
+const TOTAL = 150; // seconds total
+const SCENES = [
+  {
+    id:'s1', start:0, end:22, name:'La pregunta que lo inició todo',
+    nar:'En 1950, el matemático Alan Turing planteó una pregunta que cambiaría la historia: ¿Puede una máquina pensar? Esta pregunta tiene 74 años y todavía no tiene respuesta definitiva. Y por primera vez, algunos modelos están empezando a superarla.',
+    onEnter(){
+      setTimeout(()=>document.getElementById('s1q').classList.add('show'),300);
+    }
+  },
+  {
+    id:'s2', start:22, end:48, name:'Cerebro humano vs Red neuronal',
+    nar:'Para entender la IA, comparemos con lo que la inspiró: el cerebro humano. Tienen similitudes, pero también diferencias fundamentales. El cerebro tardó millones de años en evolucionar. Una red neuronal aprende en semanas consumiendo cantidades masivas de datos.',
+    onEnter(){
+      setTimeout(()=>document.getElementById('s2t').classList.add('show'),200);
+      setTimeout(()=>{document.getElementById('s2c1').classList.add('show');document.getElementById('s2vs').classList.add('show');},500);
+      setTimeout(()=>document.getElementById('s2c2').classList.add('show'),900);
+    }
+  },
+  {
+    id:'s3', start:48, end:82, name:'Las 4 eras de la IA',
+    nar:'La IA no llegó de golpe. Pasó por 4 períodos históricos muy distintos. Del optimismo de los 50s a los dos inviernos de financiamiento, al machine learning de los 90s, hasta la explosión del deep learning que vivimos hoy. Cada era tuvo sus lecciones.',
+    onEnter(){
+      setTimeout(()=>document.getElementById('s3t').classList.add('show'),200);
+      ['e1','e2','e3','e4'].forEach((id,i)=>{
+        setTimeout(()=>document.getElementById(id).classList.add('show'),400+i*300);
+      });
+    }
+  },
+  {
+    id:'s4', start:82, end:108, name:'Los 3 ingredientes del boom',
+    nar:'¿Por qué explotó la IA específicamente después de 2012 y no antes? Tres ingredientes convergieron al mismo tiempo: datos masivos gracias a internet, cómputo barato gracias a las GPUs de videojuegos, y el descubrimiento de los Transformers en 2017.',
+    onEnter(){
+      setTimeout(()=>document.getElementById('s4t').classList.add('show'),200);
+      setTimeout(()=>document.getElementById('i1').classList.add('show'),500);
+      setTimeout(()=>document.getElementById('a1').classList.add('show'),800);
+      setTimeout(()=>document.getElementById('i2').classList.add('show'),900);
+      setTimeout(()=>document.getElementById('a2').classList.add('show'),1200);
+      setTimeout(()=>document.getElementById('i3').classList.add('show'),1300);
+    }
+  },
+  {
+    id:'s5', start:108, end:128, name:'El impacto económico real',
+    nar:'Estos no son números de ciencia ficción. McKinsey proyecta que la IA generativa podría agregar hasta 4.4 trillones de dólares anuales a la economía global. El mercado creció de 87 mil millones en 2021 a un proyectado de 1.8 trillones en 2030.',
+    onEnter(){
+      setTimeout(()=>document.getElementById('s5t').classList.add('show'),200);
+      const bars=[['b1','bf1','25%'],['b2','bf2','48%'],['b3','bf3','100%'],['b4','bf4','55%']];
+      bars.forEach(([bi,fi,w],i)=>{
+        setTimeout(()=>{
+          document.getElementById(bi).classList.add('show');
+          setTimeout(()=>document.getElementById(fi).style.width=w,200);
+        },300+i*350);
+      });
+    }
+  },
+  {
+    id:'s6', start:128, end:150, name:'Los 4 mitos desarmados',
+    nar:'Antes de terminar, necesitamos desmontar los 4 mitos más comunes sobre la IA. Estas creencias incorrectas frenan a miles de personas de aprender y aprovechar la tecnología más importante de nuestra era. La realidad es más matizada — y más optimista.',
+    onEnter(){
+      setTimeout(()=>document.getElementById('s6t').classList.add('show'),200);
+      ['m1','m2','m3','m4'].forEach((id,i)=>{
+        setTimeout(()=>document.getElementById(id).classList.add('show'),400+i*350);
+      });
+    }
+  },
+];
+
+// ── PLAYER STATE ──
+let playing=false, elapsed=0, currentScene=0, raf=null, lastTs=null;
+
+// Build chapter dots
+const dotWrap=document.getElementById('ch-dots');
+SCENES.forEach((sc,i)=>{
+  const dot=document.createElement('div');
+  dot.className='ch-dot';
+  dot.style.left=`${(sc.start/TOTAL)*100}%`;
+  dot.onclick=(e)=>{e.stopPropagation();seekToTime(sc.start);};
+  dot.title=sc.name;
+  dotWrap.appendChild(dot);
+});
+
+function updateDots(){
+  document.querySelectorAll('.ch-dot').forEach((d,i)=>{
+    d.classList.toggle('passed',SCENES[i].start<=elapsed);
+  });
+}
+
+function formatTime(s){
+  const m=Math.floor(s/60);
+  const sec=Math.floor(s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function setScene(idx){
+  if(idx===currentScene&&document.getElementById(SCENES[idx].id).classList.contains('active'))return;
+  SCENES.forEach((sc,i)=>{
+    const el=document.getElementById(sc.id);
+    el.classList.toggle('active',i===idx);
+  });
+  currentScene=idx;
+  const sc=SCENES[idx];
+  document.getElementById('scene-lbl').textContent=sc.name;
+  document.getElementById('nar-text').textContent=sc.nar;
+
+  // Reset animations
+  const el=document.getElementById(sc.id);
+  el.querySelectorAll('.show').forEach(e=>e.classList.remove('show'));
+  document.querySelectorAll(`#${sc.id} .s5-bar-fill`).forEach(e=>e.style.width='0%');
+  sc.onEnter();
+}
+
+function updateUI(){
+  const pct=(elapsed/TOTAL)*100;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('time-lbl').textContent=`${formatTime(elapsed)} / ${formatTime(TOTAL)}`;
+
+  // Find scene
+  let scIdx=SCENES.length-1;
+  for(let i=0;i<SCENES.length;i++){
+    if(elapsed>=SCENES[i].start&&elapsed<SCENES[i].end){scIdx=i;break;}
+  }
+  if(elapsed>=TOTAL){scIdx=SCENES.length-1;}
+  setScene(scIdx);
+  updateDots();
+}
+
+function tick(ts){
+  if(!lastTs){lastTs=ts;}
+  const delta=(ts-lastTs)/1000;
+  lastTs=ts;
+  elapsed=Math.min(elapsed+delta,TOTAL);
+  updateUI();
+  if(elapsed>=TOTAL){
+    playing=false;setPlayIcon();lastTs=null;
+    document.getElementById('nar-wave').style.display='none';
+    return;
+  }
+  if(playing)raf=requestAnimationFrame(tick);
+}
+
+function togglePlay(){
+  playing=!playing;
+  setPlayIcon();
+  if(playing){
+    lastTs=null;
+    document.getElementById('nar-wave').style.display='flex';
+    raf=requestAnimationFrame(tick);
+  } else {
+    document.getElementById('nar-wave').style.display='none';
+    if(raf)cancelAnimationFrame(raf);
+  }
+}
+
+function setPlayIcon(){
+  const icon=document.getElementById('play-icon');
+  if(playing){
+    icon.innerHTML='<rect x="2" y="1" width="3" height="10" rx="1" fill="white"/><rect x="7" y="1" width="3" height="10" rx="1" fill="white"/>';
+  } else {
+    icon.innerHTML='<path d="M2 1l9 5-9 5V1z" fill="white"/>';
+  }
+}
+
+function seekTo(e){
+  const rect=document.getElementById('prog-wrap').getBoundingClientRect();
+  const pct=(e.clientX-rect.left)/rect.width;
+  elapsed=pct*TOTAL;
+  lastTs=null;
+  updateUI();
+}
+
+function seekToTime(t){
+  elapsed=t;lastTs=null;updateUI();
+}
+
+// Init
+setScene(0);
+document.getElementById('nar-text').textContent='Presiona ▶ para comenzar el video...';
+</script>
+</body>
+</html>

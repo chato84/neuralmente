@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuralMente — Academia de IA en Español</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0a0a0f;
+    --ink2: #1e1e2e;
+    --paper: #f5f3ef;
+    --paper2: #edeae4;
+    --accent: #7c5cfc;
+    --accent2: #c084fc;
+    --neon: #00e5b4;
+    --neon2: #00c49a;
+    --warm: #ff6b35;
+    --mid: #6b7280;
+    --white: #ffffff;
+    --radius: 16px;
+    --radius-sm: 8px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ink);
+    color: var(--paper);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--paper);
+  }
+
+  .logo-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--neon);
+    display: inline-block;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,229,180,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(0,229,180,0); }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: rgba(245,243,239,0.6);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--paper); }
+
+  .nav-cta {
+    background: var(--neon);
+    color: var(--ink) !important;
+    padding: 10px 22px;
+    border-radius: 99px;
+    font-weight: 500 !important;
+    font-size: 14px;
+    transition: transform 0.15s, background 0.2s !important;
+  }
+
+  .nav-cta:hover { background: var(--neon2) !important; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 140px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,92,252,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,252,0.07) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,92,252,0.18) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-glow-2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,229,180,0.12) 0%, transparent 70%);
+    top: 30%; right: 5%;
+    pointer-events: none;
+  }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--neon);
+    border: 1px solid rgba(0,229,180,0.3);
+    border-radius: 99px;
+    padding: 6px 16px;
+    margin-bottom: 28px;
+    width: fit-content;
+  }
+
+  .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(52px, 7vw, 92px);
+    line-height: 0.95;
+    letter-spacing: -3px;
+    max-width: 800px;
+    position: relative;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(245,243,239,0.35);
+  }
+
+  .hero-accent-word {
+    position: relative;
+    display: inline-block;
+  }
+
+  .hero-accent-word::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: 4px; right: 0;
+    height: 6px;
+    background: var(--neon);
+    border-radius: 3px;
+    opacity: 0.6;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    color: rgba(245,243,239,0.55);
+    max-width: 520px;
+    margin: 28px 0 44px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--neon);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 15px;
+    padding: 16px 32px;
+    border-radius: 99px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s, background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--neon2); transform: translateY(-2px); }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--paper);
+    font-size: 15px;
+    font-weight: 400;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245,243,239,0.25);
+    padding-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--paper); }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 72px;
+    padding-top: 48px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .stat-item {}
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    letter-spacing: -1px;
+    color: var(--paper);
+  }
+
+  .stat-num span { color: var(--neon); }
+  .stat-label { font-size: 13px; color: var(--mid); margin-top: 2px; }
+
+  /* ── CHAT DEMO ── */
+  .demo-section {
+    padding: 100px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .demo-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 16px;
+  }
+
+  .demo-heading {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+    margin-bottom: 20px;
+  }
+
+  .demo-body {
+    color: rgba(245,243,239,0.55);
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.75;
+    margin-bottom: 32px;
+  }
+
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 15px;
+    color: rgba(245,243,239,0.8);
+  }
+
+  .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(0,229,180,0.15);
+    border: 1px solid rgba(0,229,180,0.4);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .check::after {
+    content: '';
+    width: 8px; height: 5px;
+    border-left: 1.5px solid var(--neon);
+    border-bottom: 1.5px solid var(--neon);
+    transform: rotate(-45deg) translateY(-1px);
+  }
+
+  /* ── CHAT UI ── */
+  .chat-window {
+    background: rgba(30,30,46,0.9);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .chat-topbar {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(10,10,15,0.5);
+  }
+
+  .chat-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--neon));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .chat-name { font-size: 14px; font-weight: 500; }
+  .chat-status { font-size: 12px; color: var(--neon); }
+
+  .chat-messages {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 320px;
+  }
+
+  .msg {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: msg-in 0.4s ease both;
+  }
+
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-ai {
+    background: rgba(124,92,252,0.18);
+    border: 1px solid rgba(124,92,252,0.25);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+    color: var(--paper);
+  }
+
+  .msg-user {
+    background: rgba(0,229,180,0.12);
+    border: 1px solid rgba(0,229,180,0.2);
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+    color: var(--paper);
+  }
+
+  .msg-delay-1 { animation-delay: 0.3s; }
+  .msg-delay-2 { animation-delay: 0.7s; }
+  .msg-delay-3 { animation-delay: 1.2s; }
+  .msg-delay-4 { animation-delay: 1.8s; }
+
+  .chat-input-row {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .chat-input-fake {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: rgba(245,243,239,0.4);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .chat-send {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ── TRACKS ── */
+  .tracks-section {
+    padding: 100px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 48px;
+  }
+
+  .section-heading {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 44px;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+  }
+
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .track-card {
+    background: rgba(30,30,46,0.6);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.2s;
+    cursor: pointer;
+  }
+
+  .track-card:hover {
+    border-color: rgba(255,255,255,0.18);
+    transform: translateY(-3px);
+  }
+
+  .track-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .track-card.t-beginner::before { background: var(--neon); }
+  .track-card.t-business::before { background: var(--warm); }
+  .track-card.t-mid::before { background: var(--accent2); }
+  .track-card.t-advanced::before { background: var(--accent); }
+
+  .track-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .track-card.t-beginner .track-icon { background: rgba(0,229,180,0.15); }
+  .track-card.t-business .track-icon { background: rgba(255,107,53,0.15); }
+  .track-card.t-mid .track-icon { background: rgba(192,132,252,0.15); }
+  .track-card.t-advanced .track-icon { background: rgba(124,92,252,0.15); }
+
+  .track-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .track-desc {
+    font-size: 14px;
+    color: rgba(245,243,239,0.5);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .track-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .pill {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(245,243,239,0.6);
+  }
+
+  /* ── PRICING ── */
+  .pricing-section {
+    padding: 100px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 56px;
+    text-align: left;
+  }
+
+  .pricing-card {
+    background: rgba(30,30,46,0.6);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 32px;
+    transition: transform 0.2s;
+  }
+
+  .pricing-card:hover { transform: translateY(-4px); }
+
+  .pricing-card.featured {
+    background: rgba(124,92,252,0.12);
+    border: 2px solid rgba(124,92,252,0.5);
+    position: relative;
+  }
+
+  .pricing-badge {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 16px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  .plan-name {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 12px;
+  }
+
+  .plan-price {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 52px;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .plan-period { font-size: 14px; color: var(--mid); margin-bottom: 28px; }
+
+  .plan-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .plan-features li {
+    font-size: 14px;
+    color: rgba(245,243,239,0.75);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .plan-features li::before {
+    content: '—';
+    color: var(--mid);
+    flex-shrink: 0;
+  }
+
+  .plan-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: var(--paper);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .plan-btn:hover { background: rgba(255,255,255,0.08); }
+  .plan-btn.featured-btn { background: var(--accent); border-color: var(--accent); }
+  .plan-btn.featured-btn:hover { background: #6a4de0; }
+
+  /* ── HOW IT WORKS ── */
+  .how-section {
+    padding: 100px 48px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 56px;
+    position: relative;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 22px; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), var(--neon));
+    opacity: 0.3;
+  }
+
+  .step {
+    display: flex;
+    gap: 32px;
+    padding: 32px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--ink2);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-content {}
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .step-desc {
+    font-size: 15px;
+    color: rgba(245,243,239,0.5);
+    line-height: 1.7;
+  }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials-section {
+    padding: 100px 48px;
+    overflow: hidden;
+  }
+
+  .testimonials-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 48px;
+    flex-wrap: wrap;
+  }
+
+  .testi-card {
+    background: rgba(30,30,46,0.6);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 28px;
+    flex: 1;
+    min-width: 260px;
+  }
+
+  .testi-stars {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 16px;
+  }
+
+  .star {
+    width: 12px; height: 12px;
+    background: var(--neon);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  }
+
+  .testi-text {
+    font-size: 15px;
+    color: rgba(245,243,239,0.75);
+    line-height: 1.65;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .testi-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .testi-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .testi-name { font-size: 14px; font-weight: 500; }
+  .testi-role { font-size: 12px; color: var(--mid); }
+
+  /* ── CTA FINAL ── */
+  .cta-section {
+    padding: 100px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(124,92,252,0.12) 0%, transparent 70%);
+  }
+
+  .cta-heading {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(40px, 5vw, 72px);
+    letter-spacing: -2px;
+    line-height: 1.0;
+    max-width: 700px;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+
+  .cta-sub {
+    font-size: 17px;
+    color: rgba(245,243,239,0.5);
+    max-width: 440px;
+    margin: 0 auto 44px;
+    font-weight: 300;
+    position: relative;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 48px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-copy { font-size: 13px; color: var(--mid); }
+
+  .footer-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+    color: var(--mid);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--paper); }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <span class="logo-dot"></span>
+    NeuralMente
+  </a>
+  <ul class="nav-links">
+    <li><a href="#tracks">Cursos</a></li>
+    <li><a href="#como-funciona">Cómo funciona</a></li>
+    <li><a href="#precios">Precios</a></li>
+    <li><a href="#precios" class="nav-cta">Empezar gratis</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+
+  <div style="position:relative; z-index:1;">
+    <div class="tag-chip">
+      <span class="tag-dot"></span>
+      Tu tutor de IA disponible 24/7
+    </div>
+
+    <h1>
+      Aprende IA.<br>
+      <em>Sin límites.</em><br>
+      En <span class="hero-accent-word">español</span>.
+    </h1>
+
+    <p class="hero-sub">
+      Una academia donde la inteligencia artificial te enseña, te evalúa, te da feedback instantáneo y adapta cada lección a tu ritmo. Sin horarios. Sin esperas.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#precios" class="btn-primary">
+        Comenzar ahora — es gratis
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#como-funciona" class="btn-secondary">
+        Ver cómo funciona
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">4<span>+</span></div>
+        <div class="stat-label">Niveles de aprendizaje</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">24<span>/7</span></div>
+        <div class="stat-label">Tutor disponible</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">100<span>%</span></div>
+        <div class="stat-label">En español</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">0<span>h</span></div>
+        <div class="stat-label">Espera para respuestas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT DEMO -->
+<section class="demo-section" id="como-funciona">
+  <div>
+    <p class="demo-label">Tu tutor de IA</p>
+    <h2 class="demo-heading">Como tener un maestro privado, siempre</h2>
+    <p class="demo-body">
+      No es un video pregrabado. No es un PDF. Es una IA que te escucha, te explica de nuevo si no entendiste, te pone ejercicios según tu nivel y te da feedback real al instante.
+    </p>
+    <ul class="feature-list">
+      <li><span class="check"></span> Explica conceptos con ejemplos de tu industria</li>
+      <li><span class="check"></span> Genera ejercicios únicos para ti cada sesión</li>
+      <li><span class="check"></span> Detecta cuándo te trabaste y adapta el ritmo</li>
+      <li><span class="check"></span> Recuerda tu progreso entre sesiones</li>
+      <li><span class="check"></span> Responde en menos de 2 segundos, en español</li>
+    </ul>
+  </div>
+
+  <div class="chat-window">
+    <div class="chat-topbar">
+      <div class="chat-avatar">🤖</div>
+      <div>
+        <div class="chat-name">Tutor IA — NeuralMente</div>
+        <div class="chat-status">● En línea ahora</div>
+      </div>
+    </div>
+    <div class="chat-messages">
+      <div class="msg msg-ai msg-delay-1">
+        ¡Hola! Hoy vamos a aprender qué es una red neuronal. ¿Con qué lo comparo para que lo entiendas mejor: con el cerebro humano o con una receta de cocina? 🧠
+      </div>
+      <div class="msg msg-user msg-delay-2">
+        Con el cerebro, suena más interesante
+      </div>
+      <div class="msg msg-ai msg-delay-3">
+        Perfecto. Imagina que tu cerebro tiene millones de neuronas conectadas. Cuando aprendes algo nuevo, esas conexiones se fortalecen. Una red neuronal artificial hace exactamente lo mismo, pero con números. Cada "neurona" artificial recibe datos, los transforma y los pasa a la siguiente capa. ¿Quieres que te muestre un ejemplo visual o pasamos directo a un ejercicio práctico?
+      </div>
+      <div class="msg msg-user msg-delay-4">
+        Un ejercicio práctico, por favor
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <div class="chat-input-fake">Escribe tu pregunta...</div>
+      <div class="chat-send">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 2L7 9M14 2L9 14l-2-5L2 7l12-5z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRACKS -->
+<section class="tracks-section" id="tracks">
+  <div class="section-header">
+    <h2 class="section-heading">Elige tu<br>camino</h2>
+    <p style="font-size:15px; color:rgba(245,243,239,0.45); max-width:260px; text-align:right;">La IA detecta tu nivel y te coloca en la ruta perfecta desde el día uno</p>
+  </div>
+
+  <div class="tracks-grid">
+    <div class="track-card t-beginner">
+      <div class="track-icon">🌱</div>
+      <div class="track-name">Principiante</div>
+      <p class="track-desc">Para quien no sabe nada de IA. Empezamos desde cero con ejemplos del mundo real, sin código, sin matemáticas complicadas.</p>
+      <div class="track-pills">
+        <span class="pill">¿Qué es la IA?</span>
+        <span class="pill">ChatGPT en el trabajo</span>
+        <span class="pill">Prompts que sí funcionan</span>
+        <span class="pill">Herramientas del día a día</span>
+      </div>
+    </div>
+
+    <div class="track-card t-business">
+      <div class="track-icon">💼</div>
+      <div class="track-name">Empresarios</div>
+      <p class="track-desc">Para dueños de negocio que quieren automatizar operaciones, reducir costos y tomar mejores decisiones con IA.</p>
+      <div class="track-pills">
+        <span class="pill">Automatizar con IA</span>
+        <span class="pill">Agentes de ventas</span>
+        <span class="pill">Análisis de datos</span>
+        <span class="pill">ROI de la IA</span>
+      </div>
+    </div>
+
+    <div class="track-card t-mid">
+      <div class="track-icon">⚡</div>
+      <div class="track-name">Intermedio</div>
+      <p class="track-desc">Ya sabes lo básico y quieres ir más profundo. APIs, workflows, y cómo conectar herramientas de IA entre sí.</p>
+      <div class="track-pills">
+        <span class="pill">APIs de IA</span>
+        <span class="pill">n8n y Make.com</span>
+        <span class="pill">RAG y embeddings</span>
+        <span class="pill">Fine-tuning básico</span>
+      </div>
+    </div>
+
+    <div class="track-card t-advanced">
+      <div class="track-icon">🔬</div>
+      <div class="track-name">Avanzado</div>
+      <p class="track-desc">Para desarrolladores que quieren construir productos con IA. LLMs, agentes, arquitecturas en producción.</p>
+      <div class="track-pills">
+        <span class="pill">LLMs desde cero</span>
+        <span class="pill">Agentes autónomos</span>
+        <span class="pill">Vector databases</span>
+        <span class="pill">MLOps</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div style="text-align:center; margin-bottom:0;">
+    <p class="demo-label" style="text-align:center;">El proceso</p>
+    <h2 class="section-heading" style="text-align:center; font-size:44px;">Todo automático,<br>de principio a fin</h2>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Te registras y la IA te evalúa</div>
+        <p class="step-desc">En 5 preguntas inteligentes, la IA detecta tu nivel real, tus objetivos y tu ritmo de aprendizaje. Sin formularios largos, sin burocracia.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Recibes tu ruta personalizada</div>
+        <p class="step-desc">La IA genera un plan de estudio único para ti: qué módulos ver, en qué orden, cuánto tiempo dedicar por semana. Se ajusta conforme avanzas.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Aprendes conversando con el tutor</div>
+        <p class="step-desc">Cada lección es una conversación. Preguntas lo que no entiendes, el tutor te responde al instante, te da ejemplos y te pone retos prácticos.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-title">Completas proyectos reales</div>
+        <p class="step-desc">Al terminar cada módulo, construyes algo real: un agente, un automatizador, un análisis. La IA lo revisa y te da feedback detallado.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <div class="step-title">Recibes tu certificado verificable</div>
+        <p class="step-desc">Al completar el track, recibes un certificado digital verificable que puedes poner en LinkedIn. Todo automático, sin esperar a nadie.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div style="max-width:1200px; margin:0 auto;">
+    <p class="demo-label">Lo que dicen</p>
+    <h2 class="section-heading" style="font-size:44px; letter-spacing:-1.5px;">Resultados reales</h2>
+    <div class="testimonials-row">
+      <div class="testi-card">
+        <div class="testi-stars">
+          <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+        </div>
+        <p class="testi-text">"En 3 semanas automaticé el 40% de mi operación. El tutor me explicó todo en mi idioma, con ejemplos de mi negocio. Nunca un curso online me había dado eso."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#00e5b4;">MR</div>
+          <div>
+            <div class="testi-name">María Rodríguez</div>
+            <div class="testi-role">Dueña de restaurante, Guadalajara</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+        </div>
+        <p class="testi-text">"Soy programador pero nunca había entendido los LLMs de verdad. La IA tutor me lo explicó de 5 formas diferentes hasta que hizo click. Increíble."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#7c5cfc;">JL</div>
+          <div>
+            <div class="testi-name">Jorge López</div>
+            <div class="testi-role">Senior Dev, Buenos Aires</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+        </div>
+        <p class="testi-text">"Sin saber nada de tecnología, ahora uso IA para crear contenido, responder clientes y analizar mis ventas. El tutor tuvo infinita paciencia conmigo."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#ff6b35;">CP</div>
+          <div>
+            <div class="testi-name">Carla Pérez</div>
+            <div class="testi-role">Emprendedora, Bogotá</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="precios">
+  <p class="demo-label" style="text-align:center;">Precios</p>
+  <h2 class="section-heading" style="font-size:44px; letter-spacing:-1.5px;">Sin sorpresas.<br>Sin letra chica.</h2>
+  <p style="color:rgba(245,243,239,0.45); font-size:16px; margin-top:12px;">Cancela cuando quieras. Todos los planes incluyen tutor IA ilimitado.</p>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-name">Explorador</div>
+      <div class="plan-price">$0</div>
+      <div class="plan-period">para siempre gratis</div>
+      <ul class="plan-features">
+        <li>Acceso al track Principiante</li>
+        <li>50 mensajes/mes con el tutor IA</li>
+        <li>1 proyecto evaluado</li>
+        <li>Certificado básico</li>
+      </ul>
+      <button class="plan-btn">Empezar gratis</button>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="pricing-badge">Más popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$49</div>
+      <div class="plan-period">por mes · cancela cuando quieras</div>
+      <ul class="plan-features">
+        <li>Todos los 4 tracks desbloqueados</li>
+        <li>Tutor IA ilimitado con voz</li>
+        <li>Proyectos ilimitados con feedback</li>
+        <li>Certificados verificables</li>
+        <li>Rutas personalizadas con IA</li>
+        <li>Soporte prioritario</li>
+      </ul>
+      <button class="plan-btn featured-btn">Comenzar — 7 días gratis</button>
+    </div>
+
+    <div class="pricing-card">
+      <div class="plan-name">Empresas</div>
+      <div class="plan-price">$199</div>
+      <div class="plan-period">por mes · hasta 10 usuarios</div>
+      <ul class="plan-features">
+        <li>Todo lo del plan Pro</li>
+        <li>Dashboard de equipo</li>
+        <li>Cursos personalizados a tu empresa</li>
+        <li>Reportes de progreso del equipo</li>
+        <li>Onboarding dedicado</li>
+        <li>Factura fiscal</li>
+      </ul>
+      <button class="plan-btn">Hablar con ventas</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <h2 class="cta-heading">¿Listo para aprender IA de verdad?</h2>
+  <p class="cta-sub">Empieza hoy. Tu tutor de IA te está esperando, en español, ahora mismo.</p>
+  <a href="#" class="btn-primary" style="font-size:16px; padding:18px 40px; display:inline-flex; position:relative;">
+    Crear mi cuenta gratis
+    <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2025 NeuralMente. Todos los derechos reservados.</div>
+  <ul class="footer-links">
+    <li><a href="#">Privacidad</a></li>
+    <li><a href="#">Términos</a></li>
+    <li><a href="#">Contacto</a></li>
+  </ul>
+</footer>
+
+</body>
+</html>

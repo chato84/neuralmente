@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo funciona el Aula Virtual</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #0a0a0f; color: #f0eee8; padding: 40px 24px; min-height: 100vh; }
+  h1 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; color: #f0eee8; }
+  .sub { font-size: 14px; color: #6b7280; margin-bottom: 40px; }
+
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; max-width: 680px; margin: 0 auto; }
+
+  .node { border-radius: 14px; padding: 18px 24px; width: 100%; max-width: 420px; border: 1px solid rgba(255,255,255,0.1); }
+  .node-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .node-sub { font-size: 13px; opacity: 0.65; }
+
+  .n-teal { background: rgba(29,158,117,0.12); border-color: rgba(29,158,117,0.4); }
+  .n-teal .node-title { color: #00e5b4; }
+  .n-purple { background: rgba(124,92,252,0.12); border-color: rgba(124,92,252,0.4); }
+  .n-purple .node-title { color: #a78bfa; }
+  .n-coral { background: rgba(216,90,48,0.12); border-color: rgba(216,90,48,0.4); }
+  .n-coral .node-title { color: #fb923c; }
+  .n-amber { background: rgba(186,117,23,0.12); border-color: rgba(186,117,23,0.4); }
+  .n-amber .node-title { color: #fbbf24; }
+
+  .arrow { display: flex; justify-content: center; padding: 6px 0; }
+  .arrow svg { opacity: 0.5; }
+
+  .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 640px; }
+  .row3 .node { max-width: 100%; }
+
+  .feed-row { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 640px; }
+  .feed-side { flex: 1; }
+  .feed-center { flex: 2; }
+
+  .divider { width: 100%; max-width: 640px; border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 24px 0; }
+
+  .tech-row { display: flex; flex-wrap: wrap; gap: 10px; max-width: 640px; width: 100%; }
+  .tech-chip { font-size: 12px; padding: 6px 14px; border-radius: 99px; font-weight: 500; }
+  .tc-purple { background: rgba(124,92,252,0.2); color: #a78bfa; }
+  .tc-coral { background: rgba(216,90,48,0.2); color: #fb923c; }
+  .tc-amber { background: rgba(186,117,23,0.2); color: #fbbf24; }
+  .tc-teal { background: rgba(29,158,117,0.2); color: #00e5b4; }
+
+  .summary { width: 100%; max-width: 640px; background: rgba(255,255,255,0.04); border-radius: 14px; padding: 20px 24px; border: 1px solid rgba(255,255,255,0.08); }
+  .summary p { font-size: 14px; line-height: 1.7; color: rgba(240,238,232,0.75); }
+  .summary strong { color: #f0eee8; }
+</style>
+</head>
+<body>
+
+<h1>Cómo funciona el Aula Virtual</h1>
+<p class="sub">NeuralMente — Arquitectura simplificada del sistema de enseñanza</p>
+
+<div class="flow">
+
+  <!-- Alumno -->
+  <div class="node n-teal" style="text-align:center;">
+    <div class="node-title">👤 Alumno escribe en el chat</div>
+    <div class="node-sub">Hace preguntas, responde ejercicios, entrega retos</div>
+  </div>
+
+  <div class="arrow"><svg width="24" height="32" viewBox="0 0 24 32"><path d="M12 2v24M4 18l8 10 8-10" stroke="#1D9E75" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+
+  <!-- Chat UI -->
+  <div class="node n-purple" style="text-align:center;">
+    <div class="node-title">💬 Interfaz del Tutor (Next.js)</div>
+    <div class="node-sub">La pantalla del chat que ve el alumno en el website</div>
+  </div>
+
+  <div class="arrow"><svg width="24" height="32" viewBox="0 0 24 32"><path d="M12 2v24M4 18l8 10 8-10" stroke="#7C5CFC" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+
+  <!-- Claude + feeds -->
+  <div class="feed-row">
+    <div class="feed-side">
+      <div class="node n-amber" style="text-align:center;">
+        <div class="node-title">📄 Guión</div>
+        <div class="node-sub">El documento Track 1 que construimos — le dice a Claude qué enseñar</div>
+      </div>
+    </div>
+
+    <div class="feed-center">
+      <div class="node n-coral" style="text-align:center; padding:22px;">
+        <div class="node-title" style="font-size:17px;">🤖 Claude API</div>
+        <div class="node-sub" style="margin-top:6px;">Lee el guión + el historial + el mensaje del alumno → genera la respuesta del tutor</div>
+      </div>
+    </div>
+
+    <div class="feed-side">
+      <div class="node n-amber" style="text-align:center;">
+        <div class="node-title">💾 Historial</div>
+        <div class="node-sub">Conversaciones guardadas en Supabase — el tutor recuerda todo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><svg width="24" height="32" viewBox="0 0 24 32"><path d="M12 2v24M4 18l8 10 8-10" stroke="#1D9E75" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+
+  <!-- XP -->
+  <div class="node n-teal" style="text-align:center; max-width:500px;">
+    <div class="node-title">⭐ Sistema de XP y Progreso</div>
+    <div class="node-sub">Claude detecta si el alumno completó la lección → suma XP automáticamente → desbloquea el siguiente módulo</div>
+  </div>
+
+  <div class="arrow"><svg width="24" height="32" viewBox="0 0 24 32"><path d="M12 2v24M4 18l8 10 8-10" stroke="#1D9E75" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+
+  <!-- 3 resultados -->
+  <div class="row3">
+    <div class="node n-teal" style="text-align:center;">
+      <div class="node-title">📊 Dashboard</div>
+      <div class="node-sub">XP acumulado, nivel y badges del alumno</div>
+    </div>
+    <div class="node n-teal" style="text-align:center;">
+      <div class="node-title">🔓 Módulo siguiente</div>
+      <div class="node-sub">Se desbloquea automático al completar el reto</div>
+    </div>
+    <div class="node n-teal" style="text-align:center;">
+      <div class="node-title">🏅 Certificado</div>
+      <div class="node-sub">Se genera solo al terminar el track</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Tech stack -->
+  <div class="tech-row">
+    <span style="font-size:13px;color:#6b7280;align-self:center;">Stack:</span>
+    <span class="tech-chip tc-purple">Next.js — el website</span>
+    <span class="tech-chip tc-coral">Claude API — el tutor</span>
+    <span class="tech-chip tc-amber">Supabase — la base de datos</span>
+    <span class="tech-chip tc-teal">Stripe — los pagos</span>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Resumen simple -->
+  <div class="summary">
+    <p><strong>En lenguaje simple:</strong> el alumno escribe en el chat → Claude lee el guión del módulo + todo el historial de la conversación → responde como tutor personalizado → si el alumno completó la lección, el sistema le suma XP y desbloquea lo siguiente. <strong>Todo automático. Sin que tú tengas que hacer nada.</strong></p>
+  </div>
+
+</div>
+
+</body>
+</html>
