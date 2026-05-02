@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuralMente — Panel de Acceso</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--s1:#0d1117;--s2:#131b24;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.12);
+  --tx:#e8e6f0;--tx2:#8b8a9b;
+  --teal:#00d9b0;--pu:#7c6cfc;--am:#f0a935;--co:#f0634a;--bl:#4a90e2;
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding:32px 16px;}
+.wrap{max-width:960px;margin:0 auto;}
+
+/* Header */
+.header{text-align:center;margin-bottom:48px;}
+.logo{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,217,176,.4);}50%{box-shadow:0 0 0 5px transparent;}}
+h1{font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-1.5px;margin-bottom:8px;}
+h1 span{color:var(--teal);}
+.subtitle{font-size:14px;color:var(--tx2);max-width:480px;margin:0 auto;}
+
+/* Section label */
+.section-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);margin-bottom:14px;margin-top:36px;padding-bottom:8px;border-bottom:1px solid var(--b1);}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:12px;}
+
+/* Card */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:20px;text-decoration:none;color:var(--tx);transition:all .2s;display:block;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;transition:opacity .2s;opacity:0;}
+.card:hover{border-color:var(--b2);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.card:hover::before{opacity:1;}
+
+.card.c-teal::before{background:var(--teal);}
+.card.c-pu::before{background:var(--pu);}
+.card.c-am::before{background:var(--am);}
+.card.c-co::before{background:var(--co);}
+.card.c-bl::before{background:var(--bl);}
+
+.card-icon{font-size:28px;margin-bottom:12px;display:block;}
+.card-title{font-size:15px;font-weight:700;margin-bottom:5px;line-height:1.3;}
+.card-desc{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:12px;}
+.card-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 10px;border-radius:99px;}
+
+/* Status */
+.card-status{position:absolute;top:14px;right:14px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;}
+.status-live{background:rgba(0,217,176,.15);color:var(--teal);}
+.status-demo{background:rgba(124,108,252,.15);color:var(--pu);}
+.status-soon{background:rgba(255,255,255,.07);color:var(--tx2);}
+
+/* Footer */
+.footer{text-align:center;margin-top:48px;padding-top:24px;border-top:1px solid var(--b1);}
+.footer p{font-size:12px;color:var(--tx2);}
+.footer a{color:var(--teal);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="logo"><div class="logo-dot"></div>NeuralMente</div>
+    <h1>Panel de <span>Acceso</span></h1>
+    <p class="subtitle">Todos los módulos, demos y herramientas de la academia en un solo lugar</p>
+  </div>
+
+  <!-- WEBSITE -->
+  <div class="section-label">🌐 Website principal</div>
+  <div class="grid">
+    <a href="index.html" class="card c-teal">
+      <div class="card-status status-live">● En vivo</div>
+      <span class="card-icon">🏠</span>
+      <div class="card-title">Landing Page</div>
+      <div class="card-desc">El website principal de NeuralMente con precios, tracks y registro de alumnos.</div>
+      <span class="card-chip" style="background:rgba(0,217,176,.1);color:var(--teal);">neuralmente.app</span>
+    </a>
+    <a href="mapa-academia-completo.html" class="card c-teal">
+      <div class="card-status status-live">● En vivo</div>
+      <span class="card-icon">🗺️</span>
+      <div class="card-title">Mapa Completo de la Academia</div>
+      <div class="card-desc">Los 5 tracks, 42 módulos y 28,500 XP expandibles. El roadmap completo.</div>
+      <span class="card-chip" style="background:rgba(0,217,176,.1);color:var(--teal);">5 tracks · 42 módulos</span>
+    </a>
+  </div>
+
+  <!-- AULA -->
+  <div class="section-label">🎓 Aula virtual — Track 1 Principiante</div>
+  <div class="grid">
+    <a href="aula-interactiva.html" class="card c-pu">
+      <div class="card-status status-live">● En vivo</div>
+      <span class="card-icon">🎓</span>
+      <div class="card-title">Aula Interactiva Completa</div>
+      <div class="card-desc">El aula con todos los módulos del Track 1, sistema de XP, gamificación y tutor IA.</div>
+      <span class="card-chip" style="background:rgba(124,108,252,.1);color:var(--pu);">Track 1 · 8 módulos</span>
+    </a>
+    <a href="aula-modulo1.html" class="card c-pu">
+      <div class="card-status status-live">● En vivo</div>
+      <span class="card-icon">📖</span>
+      <div class="card-title">Módulo 1 — Historia de la IA</div>
+      <div class="card-desc">Contenido profundo con videos, quizzes, debate, brainstorm y proyecto final.</div>
+      <span class="card-chip" style="background:rgba(124,108,252,.1);color:var(--pu);">500 XP · 90 min</span>
+    </a>
+    <a href="como-funciona-aula.html" class="card c-pu">
+      <div class="card-status status-demo">Demo</div>
+      <span class="card-icon">⚙️</span>
+      <div class="card-title">Cómo Funciona el Aula</div>
+      <div class="card-desc">Diagrama visual de la arquitectura del aula — tutor, contenido, XP y automatización.</div>
+      <span class="card-chip" style="background:rgba(124,108,252,.1);color:var(--pu);">Arquitectura</span>
+    </a>
+  </div>
+
+  <!-- TUTOR -->
+  <div class="section-label">🤖 Tutor IA</div>
+  <div class="grid">
+    <a href="tutor-demo-v2.html" class="card c-teal">
+      <div class="card-status status-demo">Demo</div>
+      <span class="card-icon">🤖</span>
+      <div class="card-title">Demo del Tutor IA</div>
+      <div class="card-desc">El tutor enseñando en vivo — explica proactivamente, pregunta, evalúa y avanza solo.</div>
+      <span class="card-chip" style="background:rgba(0,217,176,.1);color:var(--teal);">Clase completa</span>
+    </a>
+    <a href="tutor-ia-real.html" class="card c-teal">
+      <div class="card-status status-demo">Demo</div>
+      <span class="card-icon">🧠</span>
+      <div class="card-title">Tutor IA con Claude API</div>
+      <div class="card-desc">Versión con Claude API real. Requiere API key de Anthropic para activar.</div>
+      <span class="card-chip" style="background:rgba(0,217,176,.1);color:var(--teal);">Claude API</span>
+    </a>
+  </div>
+
+  <!-- VIDEOS -->
+  <div class="section-label">🎬 Videos educativos</div>
+  <div class="grid">
+    <a href="video-educativo-demo.html" class="card c-am">
+      <div class="card-status status-demo">Demo</div>
+      <span class="card-icon">🎬</span>
+      <div class="card-title">Video Demo — Historia de la IA</div>
+      <div class="card-desc">6 escenas animadas con cronología, impacto económico y mitos. Demo sin audio.</div>
+      <span class="card-chip" style="background:rgba(240,169,53,.1);color:var(--am);">6 escenas · ~8 min</span>
+    </a>
+    <div class="card c-am" style="cursor:default;opacity:.6;">
+      <div class="card-status status-soon">Próximo</div>
+      <span class="card-icon">🎥</span>
+      <div class="card-title">Videos con Voz — Módulo 1</div>
+      <div class="card-desc">Los 6 videos completos con voz en español mexicano. Generados con Remotion + ElevenLabs.</div>
+      <span class="card-chip" style="background:rgba(240,169,53,.1);color:var(--am);">En producción</span>
+    </div>
+  </div>
+
+  <!-- DOCUMENTOS -->
+  <div class="section-label">📄 Documentos y recursos</div>
+  <div class="grid">
+    <a href="curriculum-neuralmente.docx" class="card c-bl">
+      <span class="card-icon">📚</span>
+      <div class="card-title">Curriculum Completo</div>
+      <div class="card-desc">Los 4 tracks, 32 módulos con contenido detallado, proyectos y sistema de XP.</div>
+      <span class="card-chip" style="background:rgba(74,144,226,.1);color:var(--bl);">Word · Descargar</span>
+    </a>
+    <a href="track1-v2-neuralmente.docx" class="card c-bl">
+      <span class="card-icon">📖</span>
+      <div class="card-title">Track 1 — Contenido Profundo</div>
+      <div class="card-desc">El guión completo del Track 1 con lecciones, ejercicios y proyectos palabra por palabra.</div>
+      <span class="card-chip" style="background:rgba(74,144,226,.1);color:var(--bl);">Word · Descargar</span>
+    </a>
+    <a href="guiones-modulo1.docx" class="card c-bl">
+      <span class="card-icon">🎙️</span>
+      <div class="card-title">Guiones de los 6 Videos</div>
+      <div class="card-desc">Los guiones completos para HeyGen o ElevenLabs. Listos para generar voz en español mexicano.</div>
+      <span class="card-chip" style="background:rgba(74,144,226,.1);color:var(--bl);">Word · Descargar</span>
+    </a>
+  </div>
+
+  <!-- PRÓXIMOS -->
+  <div class="section-label">🚀 Próximamente</div>
+  <div class="grid">
+    <div class="card c-co" style="cursor:default;opacity:.5;">
+      <div class="card-status status-soon">Próximo</div>
+      <span class="card-icon">💳</span>
+      <div class="card-title">Pagos con Stripe</div>
+      <div class="card-desc">Registro y cobro automático de $49/mes. Los alumnos pagan y acceden sin intervención tuya.</div>
+      <span class="card-chip" style="background:rgba(240,99,74,.1);color:var(--co);">En desarrollo</span>
+    </div>
+    <div class="card c-co" style="cursor:default;opacity:.5;">
+      <div class="card-status status-soon">Próximo</div>
+      <span class="card-icon">📊</span>
+      <div class="card-title">Dashboard del Alumno</div>
+      <div class="card-desc">XP, badges, progreso por módulo y certificados. Todo personalizado por alumno.</div>
+      <span class="card-chip" style="background:rgba(240,99,74,.1);color:var(--co);">En desarrollo</span>
+    </div>
+    <div class="card c-co" style="cursor:default;opacity:.5;">
+      <div class="card-status status-soon">Próximo</div>
+      <span class="card-icon">🤖</span>
+      <div class="card-title">Tutor IA en Producción</div>
+      <div class="card-desc">Claude API conectada con memoria por alumno, evaluación real y feedback personalizado.</div>
+      <span class="card-chip" style="background:rgba(240,99,74,.1);color:var(--co);">En desarrollo</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>NeuralMente · <a href="index.html">neuralmente.app</a> · La primera academia de IA en español</p>
+  </div>
+
+</div>
+</body>
+</html>
