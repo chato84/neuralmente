@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuralMente — Encuentra tu camino</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--s1:#0d1117;--s2:#131b24;--s3:#1a2333;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);--b3:rgba(255,255,255,.2);
+  --tx:#e8e6f0;--tx2:#8b8a9b;--tx3:#4a4958;
+  --teal:#00d9b0;--td:rgba(0,217,176,.1);--tb:rgba(0,217,176,.25);
+  --pu:#7c6cfc;--pd:rgba(124,108,252,.1);--pb:rgba(124,108,252,.25);
+  --am:#f0a935;--ad:rgba(240,169,53,.1);--ab:rgba(240,169,53,.25);
+  --co:#f0634a;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'Outfit',sans-serif;}
+body{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px 48px;}
+
+/* ── TOP BAR ── */
+.topbar{width:100%;max-width:640px;display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}
+.logo{font-size:15px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:7px;color:var(--tx);}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,217,176,.4);}50%{box-shadow:0 0 0 5px transparent;}}
+.skip{font-size:12px;color:var(--tx2);text-decoration:none;transition:color .2s;}
+.skip:hover{color:var(--tx);}
+
+/* ── PROGRESS ── */
+.progress-wrap{width:100%;max-width:640px;margin-bottom:40px;}
+.progress-info{display:flex;justify-content:space-between;margin-bottom:8px;}
+.progress-label{font-size:12px;color:var(--tx2);}
+.progress-step{font-size:12px;font-weight:600;color:var(--teal);}
+.progress-bar{height:4px;background:var(--s3);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--pu));border-radius:99px;transition:width .5s cubic-bezier(.34,1.2,.64,1);}
+
+/* ── QUESTION CARD ── */
+.card{width:100%;max-width:640px;animation:fadeUp .4s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.q-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;}
+.q-title{font-size:clamp(22px,4vw,32px);font-weight:800;letter-spacing:-.8px;line-height:1.15;margin-bottom:6px;}
+.q-sub{font-size:14px;color:var(--tx2);margin-bottom:32px;line-height:1.6;}
+
+/* Options */
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--s1);border:1.5px solid var(--b1);border-radius:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
+.opt::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--td),transparent);opacity:0;transition:opacity .2s;}
+.opt:hover{border-color:var(--tb);transform:translateY(-2px);}
+.opt:hover::before{opacity:1;}
+.opt.selected{border-color:var(--teal);background:var(--td);}
+.opt.selected::before{opacity:1;}
+
+.opt-icon{width:44px;height:44px;border-radius:11px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:background .15s;}
+.opt.selected .opt-icon{background:rgba(0,217,176,.2);}
+.opt-body{flex:1;min-width:0;}
+.opt-title{font-size:15px;font-weight:600;margin-bottom:2px;}
+.opt-desc{font-size:12px;color:var(--tx2);line-height:1.4;}
+.opt-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.opt.selected .opt-check{background:var(--teal);border-color:var(--teal);}
+.opt-check-inner{width:10px;height:6px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg) translateY(-1px);opacity:0;transition:opacity .15s;}
+.opt.selected .opt-check-inner{opacity:1;}
+
+/* Grid options (for multi-select style) */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.opt-grid{padding:18px 16px;background:var(--s1);border:1.5px solid var(--b1);border-radius:14px;cursor:pointer;transition:all .15s;text-align:center;position:relative;overflow:hidden;}
+.opt-grid::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--pd),transparent);opacity:0;transition:opacity .2s;}
+.opt-grid:hover{border-color:var(--pb);transform:translateY(-2px);}
+.opt-grid:hover::before{opacity:1;}
+.opt-grid.selected{border-color:var(--pu);background:var(--pd);}
+.opt-grid.selected::before{opacity:1;}
+.opt-grid-icon{font-size:28px;margin-bottom:8px;}
+.opt-grid-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.opt-grid-desc{font-size:11px;color:var(--tx2);}
+
+/* Next button */
+.next-btn{width:100%;max-width:640px;margin-top:20px;padding:16px;background:var(--teal);border:none;border-radius:14px;font-size:16px;font-weight:700;color:#000;cursor:pointer;font-family:inherit;transition:all .2s;display:none;align-items:center;justify-content:center;gap:8px;}
+.next-btn.show{display:flex;}
+.next-btn:hover{background:#00c49a;transform:translateY(-2px);}
+
+/* ── RESULT SCREEN ── */
+.result{width:100%;max-width:640px;display:none;animation:fadeUp .5s ease both;}
+.result.show{display:block;}
+.result-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+.result-title{font-size:clamp(26px,5vw,40px);font-weight:900;letter-spacing:-1.5px;line-height:1.1;margin-bottom:8px;}
+.result-sub{font-size:15px;color:var(--tx2);line-height:1.7;margin-bottom:32px;}
+
+.result-track{border-radius:16px;overflow:hidden;margin-bottom:16px;}
+.result-track-head{padding:18px 20px;display:flex;align-items:center;gap:14px;}
+.result-track-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.result-track-name{font-size:18px;font-weight:800;letter-spacing:-.3px;}
+.result-track-desc{font-size:13px;opacity:.75;margin-top:2px;}
+.result-track-body{padding:16px 20px;display:flex;flex-direction:column;gap:8px;}
+.result-feat{display:flex;align-items:center;gap:10px;font-size:13px;}
+.result-feat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+.result-cta{width:100%;padding:18px;border-radius:14px;border:none;font-size:16px;font-weight:800;color:#000;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-bottom:10px;}
+.result-cta:hover{transform:translateY(-2px);}
+.result-cta-sec{width:100%;padding:14px;border-radius:14px;border:1.5px solid var(--b2);background:transparent;font-size:14px;font-weight:500;color:var(--tx2);cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;text-decoration:none;display:block;}
+.result-cta-sec:hover{border-color:var(--b3);color:var(--tx);}
+
+.testimonial{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px;margin-top:16px;}
+.testi-text{font-size:13px;color:var(--tx2);line-height:1.6;font-style:italic;margin-bottom:10px;}
+.testi-author{display:flex;align-items:center;gap:8px;}
+.testi-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0;}
+.testi-name{font-size:12px;font-weight:600;}
+.testi-role{font-size:11px;color:var(--tx2);}
+
+/* ── LOADING ── */
+.loading{width:100%;max-width:640px;text-align:center;padding:60px 0;display:none;}
+.loading.show{display:block;}
+.loading-spinner{width:48px;height:48px;border:3px solid var(--b2);border-top-color:var(--teal);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:14px;color:var(--tx2);}
+.loading-steps{margin-top:20px;display:flex;flex-direction:column;gap:8px;}
+.loading-step{font-size:13px;color:var(--tx3);display:flex;align-items:center;gap:8px;justify-content:center;opacity:0;transition:opacity .4s;}
+.loading-step.show{opacity:1;color:var(--teal);}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo"><div class="logo-dot"></div>NeuralMente</div>
+  <a href="aula-interactiva.html" class="skip">Saltar →</a>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap" id="progress-wrap">
+  <div class="progress-info">
+    <span class="progress-label" id="progress-label">Personalizando tu experiencia</span>
+    <span class="progress-step" id="progress-step">1 de 5</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+</div>
+
+<!-- QUESTIONS -->
+<div id="quiz-area">
+
+<!-- Q1 -->
+<div class="card" id="q1">
+  <div class="q-tag">Pregunta 1 de 5</div>
+  <div class="q-title">¿Cuál es tu nivel actual con la Inteligencia Artificial?</div>
+  <div class="q-sub">Sé honesto — no hay respuesta correcta o incorrecta. Esto nos ayuda a colocarte en el track perfecto.</div>
+  <div class="options">
+    <div class="opt" onclick="selectOpt('q1',this,0)">
+      <div class="opt-icon">🌱</div>
+      <div class="opt-body"><div class="opt-title">No sé nada de IA</div><div class="opt-desc">He oído hablar de ChatGPT pero nunca lo he usado seriamente</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+    <div class="opt" onclick="selectOpt('q1',this,1)">
+      <div class="opt-icon">⚡</div>
+      <div class="opt-body"><div class="opt-title">Uso algunas herramientas básicas</div><div class="opt-desc">Uso ChatGPT o similares para tareas simples pero no lo domino</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+    <div class="opt" onclick="selectOpt('q1',this,2)">
+      <div class="opt-icon">🔧</div>
+      <div class="opt-body"><div class="opt-title">Tengo conocimiento intermedio</div><div class="opt-desc">Uso IA regularmente y entiendo cómo funciona a grandes rasgos</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+    <div class="opt" onclick="selectOpt('q1',this,3)">
+      <div class="opt-icon">🚀</div>
+      <div class="opt-body"><div class="opt-title">Soy técnico / desarrollador</div><div class="opt-desc">Programo y quiero construir productos o sistemas con IA</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="card" id="q2" style="display:none">
+  <div class="q-tag">Pregunta 2 de 5</div>
+  <div class="q-title">¿Para qué quieres aprender IA?</div>
+  <div class="q-sub">Tu objetivo define qué track de NeuralMente es el ideal para ti.</div>
+  <div class="options-grid">
+    <div class="opt-grid" onclick="selectGrid('q2',this,0)">
+      <div class="opt-grid-icon">💼</div>
+      <div class="opt-grid-title">Mejorar mi trabajo</div>
+      <div class="opt-grid-desc">Ser más productivo y eficiente</div>
+    </div>
+    <div class="opt-grid" onclick="selectGrid('q2',this,1)">
+      <div class="opt-grid-icon">🏢</div>
+      <div class="opt-grid-title">Hacer crecer mi negocio</div>
+      <div class="opt-grid-desc">Automatizar y reducir costos</div>
+    </div>
+    <div class="opt-grid" onclick="selectGrid('q2',this,2)">
+      <div class="opt-grid-icon">💻</div>
+      <div class="opt-grid-title">Construir con IA</div>
+      <div class="opt-grid-desc">Apps, agentes y sistemas</div>
+    </div>
+    <div class="opt-grid" onclick="selectGrid('q2',this,3)">
+      <div class="opt-grid-icon">🎯</div>
+      <div class="opt-grid-title">Cambiar de carrera</div>
+      <div class="opt-grid-desc">Entrar al mundo de la IA</div>
+    </div>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="card" id="q3" style="display:none">
+  <div class="q-tag">Pregunta 3 de 5</div>
+  <div class="q-title">¿Cuánto tiempo puedes dedicar por semana?</div>
+  <div class="q-sub">Somos honestos: cada módulo toma entre 60 y 90 minutos. Queremos que tengas éxito.</div>
+  <div class="options">
+    <div class="opt" onclick="selectOpt('q3',this,0)">
+      <div class="opt-icon">☕</div>
+      <div class="opt-body"><div class="opt-title">1-2 horas por semana</div><div class="opt-desc">Ritmo relajado — 1 módulo cada 2-3 semanas</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+    <div class="opt" onclick="selectOpt('q3',this,1)">
+      <div class="opt-icon">⚡</div>
+      <div class="opt-body"><div class="opt-title">3-5 horas por semana</div><div class="opt-desc">Ritmo estándar — 1 módulo por semana</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+    <div class="opt" onclick="selectOpt('q3',this,2)">
+      <div class="opt-icon">🔥</div>
+      <div class="opt-body"><div class="opt-title">5+ horas por semana</div><div class="opt-desc">Ritmo intensivo — 2 módulos por semana</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="card" id="q4" style="display:none">
+  <div class="q-tag">Pregunta 4 de 5</div>
+  <div class="q-title">¿Cuál es tu industria o área de trabajo?</div>
+  <div class="q-sub">Personalizamos todos los ejemplos y ejercicios a tu contexto real.</div>
+  <div class="options-grid">
+    <div class="opt-grid" onclick="selectGrid('q4',this,0)">
+      <div class="opt-grid-icon">🛍️</div>
+      <div class="opt-grid-title">Ventas / Marketing</div>
+      <div class="opt-grid-desc"></div>
+    </div>
+    <div class="opt-grid" onclick="selectGrid('q4',this,1)">
+      <div class="opt-grid-icon">🏥</div>
+      <div class="opt-grid-title">Salud</div>
+      <div class="opt-grid-desc"></div>
+    </div>
+    <div class="opt-grid" onclick="selectGrid('q4',this,2)">
+      <div class="opt-grid-icon">💰</div>
+      <div class="opt-grid-title">Finanzas</div>
+      <div class="opt-grid-desc"></div>
+    </div>
+    <div class="opt-grid" onclick="selectGrid('q4',this,3)">
+      <div class="opt-grid-icon">📚</div>
+      <div class="opt-grid-title">Educación</div>
+      <div class="opt-grid-desc"></div>
+    </div>
+    <div class="opt-grid" onclick="selectGrid('q4',this,4)">
+      <div class="opt-grid-icon">💻</div>
+      <div class="opt-grid-title">Tecnología</div>
+      <div class="opt-grid-desc"></div>
+    </div>
+    <div class="opt-grid" onclick="selectGrid('q4',this,5)">
+      <div class="opt-grid-icon">🏢</div>
+      <div class="opt-grid-title">Otro</div>
+      <div class="opt-grid-desc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="card" id="q5" style="display:none">
+  <div class="q-tag">Pregunta 5 de 5</div>
+  <div class="q-title">¿Qué resultado quieres lograr en los próximos 3 meses?</div>
+  <div class="q-sub">Sé específico — esto nos ayuda a medir tu éxito real.</div>
+  <div class="options">
+    <div class="opt" onclick="selectOpt('q5',this,0)">
+      <div class="opt-icon">⏱️</div>
+      <div class="opt-body"><div class="opt-title">Ahorrar tiempo en mi trabajo diario</div><div class="opt-desc">Automatizar tareas repetitivas con IA</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+    <div class="opt" onclick="selectOpt('q5',this,1)">
+      <div class="opt-icon">💸</div>
+      <div class="opt-body"><div class="opt-title">Generar más ingresos</div><div class="opt-desc">Usar IA para crecer mi negocio o conseguir mejor empleo</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+    <div class="opt" onclick="selectOpt('q5',this,2)">
+      <div class="opt-icon">🛠️</div>
+      <div class="opt-body"><div class="opt-title">Construir algo concreto</div><div class="opt-desc">Un agente, una app, un sistema con IA</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+    <div class="opt" onclick="selectOpt('q5',this,3)">
+      <div class="opt-icon">🧠</div>
+      <div class="opt-body"><div class="opt-title">Entender la IA a fondo</div><div class="opt-desc">Tener bases sólidas para no quedarme atrás</div></div>
+      <div class="opt-check"><div class="opt-check-inner"></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /quiz-area -->
+
+<!-- NEXT BUTTON -->
+<button class="next-btn" id="next-btn" onclick="nextQuestion()">
+  Continuar <span>→</span>
+</button>
+
+<!-- LOADING -->
+<div class="loading" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Analizando tus respuestas...</div>
+  <div class="loading-steps">
+    <div class="loading-step" id="ls1">✓ Evaluando tu nivel actual</div>
+    <div class="loading-step" id="ls2">✓ Identificando tu track ideal</div>
+    <div class="loading-step" id="ls3">✓ Personalizando tu ruta de aprendizaje</div>
+    <div class="loading-step" id="ls4">✓ Calculando tiempo para alcanzar tus metas</div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="result" id="result">
+  <div class="result-tag" id="result-tag">🎯 Tu plan personalizado</div>
+  <div class="result-title" id="result-title">Perfecto para ti</div>
+  <div class="result-sub" id="result-sub">Basado en tus respuestas, este es tu camino ideal.</div>
+
+  <div class="result-track" id="result-track">
+    <div class="result-track-head" id="result-track-head">
+      <div class="result-track-icon" id="result-track-icon">🌱</div>
+      <div>
+        <div class="result-track-name" id="result-track-name">Track 1</div>
+        <div class="result-track-desc" id="result-track-desc">Fundamentos de IA</div>
+      </div>
+    </div>
+    <div class="result-track-body" id="result-track-body"></div>
+  </div>
+
+  <a href="aula-interactiva.html" class="result-cta" id="result-cta">
+    Empezar mi plan gratis →
+  </a>
+  <a href="index.html#precios" class="result-cta-sec">Ver todos los planes</a>
+
+  <div class="testimonial" id="result-testimonial"></div>
+</div>
+
+<script>
+const answers = {};
+let currentQ = 1;
+const totalQ = 5;
+
+// Track data
+const TRACKS = [
+  {
+    id: 0,
+    name: "Track 1 — Fundamentos de IA",
+    emoji: "🌱",
+    color: "#00d9b0",
+    bg: "rgba(0,217,176,.08)",
+    border: "rgba(0,217,176,.25)",
+    desc: "El punto de partida perfecto — de cero a bases sólidas en 12 semanas",
+    features: [
+      "Historia y presente de la IA — sin tecnicismos",
+      "Cómo funciona la IA por dentro — con analogías",
+      "Prompting profesional — la habilidad más valiosa",
+      "Ecosistema completo de herramientas de IA",
+      "Tu primer proyecto real con IA"
+    ],
+    testimonial: {
+      text: "Entré sin saber nada y en 8 semanas ya estaba automatizando tareas en mi trabajo. El tutor IA es increíble — nunca me sentí perdido.",
+      name: "María González",
+      role: "Administradora, Ciudad de México",
+      color: "#00d9b0"
+    }
+  },
+  {
+    id: 1,
+    name: "Track 2 — IA para Negocios",
+    emoji: "💼",
+    color: "#f0a935",
+    bg: "rgba(240,169,53,.08)",
+    border: "rgba(240,169,53,.25)",
+    desc: "Para empresarios y profesionales — resultados medibles en tu negocio",
+    features: [
+      "Agente de ventas con IA funcionando 24/7",
+      "Automatización de operaciones con Make.com",
+      "Marketing con IA a escala",
+      "Dashboard de datos de tu negocio",
+      "ROI documentado y medible"
+    ],
+    testimonial: {
+      text: "En 6 semanas automaticé el 60% de mi operación. El agente de ventas responde clientes mientras duermo. El ROI fue inmediato.",
+      name: "Carlos Mendoza",
+      role: "Dueño de negocio, Monterrey",
+      color: "#f0a935"
+    }
+  },
+  {
+    id: 2,
+    name: "Track 3 — Constructor IA",
+    emoji: "🔧",
+    color: "#7c6cfc",
+    bg: "rgba(124,108,252,.08)",
+    border: "rgba(124,108,252,.25)",
+    desc: "Para desarrolladores — construye productos reales con IA",
+    features: [
+      "APIs de Claude y OpenAI desde cero",
+      "RAG — IA con tus propios documentos",
+      "Agentes autónomos con memoria",
+      "Deploy en producción con Vercel + Supabase",
+      "Tu micro-SaaS de IA funcionando"
+    ],
+    testimonial: {
+      text: "Construí mi primer SaaS de IA en 3 semanas. Ya tiene 50 usuarios pagando. NeuralMente me enseñó exactamente lo que necesitaba.",
+      name: "Diego Ramírez",
+      role: "Desarrollador, Buenos Aires",
+      color: "#7c6cfc"
+    }
+  }
+];
+
+function selectOpt(qId, el, val) {
+  document.querySelectorAll(`#${qId} .opt`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qId] = val;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function selectGrid(qId, el, val) {
+  document.querySelectorAll(`#${qId} .opt-grid`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qId] = val;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  if (currentQ < totalQ) {
+    document.getElementById(`q${currentQ}`).style.display = 'none';
+    currentQ++;
+    const next = document.getElementById(`q${currentQ}`);
+    next.style.display = 'block';
+    next.style.animation = 'none';
+    next.offsetHeight;
+    next.style.animation = 'fadeUp .4s ease both';
+
+    // Update progress
+    const pct = (currentQ / totalQ) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-step').textContent = `${currentQ} de ${totalQ}`;
+    document.getElementById('next-btn').classList.remove('show');
+
+    // Check if already answered
+    if (answers[`q${currentQ}`] !== undefined) {
+      document.getElementById('next-btn').classList.add('show');
+    }
+  } else {
+    showLoading();
+  }
+}
+
+function showLoading() {
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('next-btn').classList.remove('show');
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('loading').classList.add('show');
+
+  const steps = ['ls1','ls2','ls3','ls4'];
+  steps.forEach((id, i) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('show');
+    }, 600 + i * 700);
+  });
+
+  setTimeout(showResult, 3800);
+}
+
+function showResult() {
+  document.getElementById('loading').classList.remove('show');
+
+  // Determine track based on answers
+  let trackIdx = 0;
+  const level = answers['q1'] || 0;
+  const goal = answers['q2'] || 0;
+
+  if (level >= 3 || goal === 2) trackIdx = 2;
+  else if (level >= 1 && goal === 1) trackIdx = 1;
+  else if (goal === 1) trackIdx = 1;
+  else trackIdx = 0;
+
+  const track = TRACKS[trackIdx];
+
+  // Populate result
+  document.getElementById('result-tag').textContent = '🎯 Tu plan personalizado está listo';
+  document.getElementById('result-title').textContent = `${track.emoji} ${track.name}`;
+  document.getElementById('result-sub').textContent = track.desc;
+
+  const head = document.getElementById('result-track-head');
+  head.style.background = track.bg;
+  document.getElementById('result-track').style.border = `1.5px solid ${track.border}`;
+  document.getElementById('result-track').style.borderRadius = '16px';
+  document.getElementById('result-track').style.overflow = 'hidden';
+  document.getElementById('result-track-icon').textContent = track.emoji;
+  document.getElementById('result-track-icon').style.background = track.bg;
+  document.getElementById('result-track-name').textContent = track.name;
+  document.getElementById('result-track-desc').textContent = track.desc;
+
+  const body = document.getElementById('result-track-body');
+  body.style.background = 'var(--s2)';
+  body.style.padding = '16px 20px';
+  body.innerHTML = track.features.map(f => `
+    <div class="result-feat">
+      <div class="result-feat-dot" style="background:${track.color}"></div>
+      <span style="font-size:13px;">${f}</span>
+    </div>
+  `).join('');
+
+  const cta = document.getElementById('result-cta');
+  cta.style.background = track.color;
+  cta.textContent = `Empezar ${track.name} →`;
+
+  const testi = document.getElementById('result-testimonial');
+  testi.innerHTML = `
+    <div class="testi-text">"${track.testimonial.text}"</div>
+    <div class="testi-author">
+      <div class="testi-av" style="background:${track.testimonial.color}">${track.testimonial.name.charAt(0)}</div>
+      <div>
+        <div class="testi-name">${track.testimonial.name}</div>
+        <div class="testi-role">${track.testimonial.role}</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('result').classList.add('show');
+}
+
+// Handle enter key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('next-btn').classList.contains('show')) {
+    nextQuestion();
+  }
+});
+</script>
+</body>
+</html>
