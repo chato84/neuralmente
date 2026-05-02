@@ -82,6 +82,61 @@ h1 span{color:var(--teal);}
 /* Back link */
 .back{font-size:13px;color:var(--tx2);text-decoration:none;margin-bottom:24px;display:flex;align-items:center;gap:5px;align-self:flex-start;max-width:960px;width:100%;}
 .back:hover{color:var(--tx);}
+
+@media(max-width:768px){
+  nav{padding:12px 16px!important;flex-wrap:wrap;gap:8px;}
+  .nav-links{display:none!important;}
+  .hero{padding:100px 20px 60px!important;}
+  h1{font-size:clamp(36px,8vw,60px)!important;letter-spacing:-1px!important;}
+  .hero-stats{flex-wrap:wrap;gap:24px!important;}
+  .demo-section{grid-template-columns:1fr!important;padding:60px 20px!important;gap:40px!important;}
+  .tracks-grid{grid-template-columns:1fr!important;}
+  .pricing-grid{grid-template-columns:1fr!important;}
+  .testimonials-row{flex-direction:column!important;}
+  .how-section{padding:60px 20px!important;}
+  .tracks-section{padding:60px 20px!important;}
+  .pricing-section{padding:60px 20px!important;}
+  .cta-section{padding:60px 20px!important;}
+  footer{flex-direction:column!important;gap:16px!important;text-align:center!important;padding:32px 20px!important;}
+  .layout{grid-template-columns:1fr!important;}
+  .sidebar{display:none!important;}
+  .tutor-panel{display:none!important;}
+  .sb{display:none!important;}
+  .tutor{display:none!important;}
+  .stats-grid{grid-template-columns:1fr 1fr!important;}
+  .era-grid{grid-template-columns:1fr!important;}
+  .compare-grid{grid-template-columns:1fr!important;}
+  .plans{grid-template-columns:1fr!important;}
+  .next-grid{grid-template-columns:1fr!important;}
+  .total-grid{grid-template-columns:1fr 1fr!important;}
+  .steps-row{display:none!important;}
+  .topbar{flex-wrap:wrap;gap:8px;padding:8px 12px!important;}
+  .mod-pill{max-width:200px!important;}
+  .xp-chip{font-size:11px!important;}
+  .track-header{flex-direction:column!important;gap:12px!important;}
+  .track-right{align-items:flex-start!important;}
+  .modules-grid{grid-template-columns:1fr!important;}
+  .result-track-head{flex-direction:column!important;gap:8px!important;}
+  .deb-sides{grid-template-columns:1fr!important;}
+  .options-grid{grid-template-columns:1fr 1fr!important;}
+  .toggle-wrap{flex-wrap:wrap!important;}
+  .guarantee{flex-direction:column!important;text-align:center!important;}
+  .s2-grid{grid-template-columns:1fr!important;gap:12px!important;}
+  .s4-ingr{flex-direction:column!important;align-items:center!important;}
+  .s5-bars .s5-bar-item{flex-direction:column!important;gap:4px!important;}
+  .s5-bar-label{text-align:left!important;width:100%!important;}
+  .ingr{max-width:100%!important;}
+  .controls{flex-wrap:wrap!important;gap:6px!important;}
+  .scene-label{display:none!important;}
+}
+@media(max-width:480px){
+  .grid{grid-template-columns:1fr!important;}
+  .stats{gap:20px!important;}
+  h1{font-size:clamp(28px,7vw,40px)!important;}
+  .s3-eras{flex-direction:column!important;}
+  .cgrid{grid-template-columns:1fr!important;}
+  .concept-grid{grid-template-columns:1fr!important;}
+}
 </style>
 </head>
 <body>
@@ -142,7 +197,7 @@ h1 span{color:var(--teal);}
       <li><div class="feat-check">✓</div>Acceso a nuevos módulos al instante</li>
       <li><div class="feat-check">✓</div>Sistema de XP y badges</li>
     </ul>
-    <a href="aula-interactiva.html" class="plan-btn primary" id="pro-btn">Comenzar — 7 días gratis →</a>
+    <a href="https://buy.stripe.com/7sYfZh5i0eyleTfgM72Nq00" class="plan-btn primary" id="pro-btn">Comenzar — 7 días gratis →</a>
   </div>
 
   <!-- Plan Empresas -->
@@ -241,5 +296,252 @@ function toggleFaq(el) {
   el.classList.toggle('open');
 }
 </script>
+<!-- NEURALMENTE CHATBOT - Pega esto antes de </body> en cada página -->
+<style>
+.nm-chat-btn{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c6cfc,#00d9b0);border:none;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 20px rgba(124,108,252,.4);transition:transform .2s;}
+.nm-chat-btn:hover{transform:scale(1.1);}
+.nm-chat-btn .notif{position:absolute;top:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:#f0634a;border:2px solid #07090f;animation:pulse2 2s infinite;}
+@keyframes pulse2{0%,100%{transform:scale(1);}50%{transform:scale(1.2);}}
+.nm-chat-box{position:fixed;bottom:90px;right:24px;width:340px;height:480px;background:#0d1117;border:1px solid rgba(255,255,255,.1);border-radius:20px;display:none;flex-direction:column;overflow:hidden;z-index:998;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.nm-chat-box.open{display:flex;}
+.nm-chat-head{padding:14px 16px;background:linear-gradient(135deg,rgba(124,108,252,.2),rgba(0,217,176,.1));border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.nm-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c6cfc,#00d9b0);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.nm-head-info{}
+.nm-head-name{font-size:13px;font-weight:700;color:#e8e6f0;font-family:'Outfit',sans-serif;}
+.nm-head-status{font-size:11px;color:#00d9b0;display:flex;align-items:center;gap:4px;}
+.nm-status-dot{width:5px;height:5px;border-radius:50%;background:#00d9b0;}
+.nm-close{margin-left:auto;background:transparent;border:none;color:#8b8a9b;font-size:18px;cursor:pointer;line-height:1;padding:4px;}
+.nm-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.nm-msgs::-webkit-scrollbar{width:3px;}.nm-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+.nm-msg{max-width:88%;animation:msgIn .3s ease both;}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.nm-msg.bot{align-self:flex-start;}
+.nm-msg.usr{align-self:flex-end;}
+.nm-bub{padding:9px 13px;border-radius:14px;font-size:12.5px;line-height:1.6;font-family:'Outfit',sans-serif;}
+.nm-msg.bot .nm-bub{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-top-left-radius:3px;color:#e8e6f0;}
+.nm-msg.usr .nm-bub{background:rgba(124,108,252,.25);border:1px solid rgba(124,108,252,.3);border-top-right-radius:3px;color:#e8e6f0;}
+.nm-typing{align-self:flex-start;animation:msgIn .3s ease both;}
+.nm-dots{padding:10px 14px;background:rgba(255,255,255,.06);border-radius:14px;border-top-left-radius:3px;display:inline-flex;gap:3px;align-items:center;}
+.nm-dot{width:5px;height:5px;border-radius:50%;background:#8b8a9b;animation:bounce2 1.2s ease infinite;}
+.nm-dot:nth-child(2){animation-delay:.2s;}.nm-dot:nth-child(3){animation-delay:.4s;}
+@keyframes bounce2{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.nm-qr{display:flex;flex-wrap:wrap;gap:5px;padding:6px 12px;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;}
+.nm-q{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:5px 11px;font-size:11px;color:#8b8a9b;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
+.nm-q:hover{background:rgba(124,108,252,.15);border-color:rgba(124,108,252,.3);color:#e8e6f0;}
+.nm-inp-wrap{padding:8px 10px 12px;display:flex;gap:7px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.07);}
+.nm-inp{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:9px 12px;font-size:12.5px;color:#e8e6f0;font-family:'Outfit',sans-serif;outline:none;resize:none;min-height:38px;max-height:80px;}
+.nm-inp::placeholder{color:#4a4958;}
+.nm-inp:focus{border-color:rgba(124,108,252,.4);}
+.nm-send{width:38px;height:38px;border-radius:9px;background:#7c6cfc;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;}
+.nm-send:hover{background:#6a5ce8;}
+@media(max-width:480px){
+  .nm-chat-box{width:calc(100vw - 32px);right:16px;bottom:80px;}
+  .nm-chat-btn{right:16px;bottom:16px;}
+}
+</style>
+
+<button class="nm-chat-btn" onclick="nmToggle()" title="Chat con el tutor IA">
+  🤖
+  <div class="notif"></div>
+</button>
+
+<div class="nm-chat-box" id="nm-box">
+  <div class="nm-chat-head">
+    <div class="nm-av">🤖</div>
+    <div class="nm-head-info">
+      <div class="nm-head-name">Tutor IA — NeuralMente</div>
+      <div class="nm-head-status"><div class="nm-status-dot"></div>En línea ahora</div>
+    </div>
+    <button class="nm-close" onclick="nmToggle()">✕</button>
+  </div>
+  <div class="nm-msgs" id="nm-msgs"></div>
+  <div class="nm-qr" id="nm-qr"></div>
+  <div class="nm-inp-wrap">
+    <textarea class="nm-inp" id="nm-inp" placeholder="Escribe tu pregunta..." rows="1"></textarea>
+    <button class="nm-send" onclick="nmSend()">
+      <svg width="15" height="15" viewBox="0 0 18 18" fill="none"><path d="M15.5 2.5L8 10M15.5 2.5L10.5 16L8 10M15.5 2.5L2 7L8 10" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+const NM_API_KEY = ""; // ← Tu API key de Anthropic aquí
+const NM_DEMO = NM_API_KEY === "";
+
+let nmOpen = false;
+let nmBusy = false;
+let nmHistory = [];
+let nmFirstOpen = true;
+
+const NM_SYSTEM = `Eres el asistente virtual de NeuralMente, la primera academia de IA en español. 
+Tu rol: ayudar a visitantes a entender la academia, responder preguntas, y guiarlos a registrarse.
+
+SOBRE NEURALMENTE:
+- Academia de IA 100% en español con tutor IA que enseña proactivamente
+- 5 tracks: Principiante, Negocios, Constructor, Avanzado, Arquitecto Master  
+- 42 módulos, 28,500 XP, certificados verificables
+- Precio: $49.99/mes con 3 días de prueba gratis (tarjeta requerida)
+- Plan gratuito: acceso muy limitado al Módulo 1
+- Website: neuralmente.app
+
+REGLAS:
+- Responde SIEMPRE en español
+- Sé amable, entusiasta pero honesto
+- Respuestas cortas: máximo 3-4 líneas
+- Si preguntan por precios → menciona los $49.99/mes y el trial de 3 días
+- Si quieren empezar → diles que hagan el quiz en neuralmente.app/quiz.html
+- No inventes información que no tengas`;
+
+const NM_DEMO_RESPONSES = {
+  default: [
+    "¡Hola! Soy el asistente de NeuralMente. ¿Tienes alguna pregunta sobre la academia o quieres saber cómo empezar?",
+    "En NeuralMente aprendes IA en español con un tutor IA que te enseña como un maestro real — no solo responde preguntas, sino que lleva las clases.",
+    "Tenemos 5 tracks desde principiante hasta arquitecto IA. Empieza con el quiz para saber cuál es el ideal para ti.",
+    "El plan Pro cuesta $49.99/mes con 3 días de prueba gratis. Puedes cancelar cuando quieras.",
+  ],
+  precio: ["El plan Pro cuesta $49.99/mes con 3 días de prueba totalmente gratis. Durante el trial tienes acceso a todo. Si cancelas antes del día 4 no se te cobra nada. ¿Te gustaría empezar?"],
+  gratis: ["Tenemos un plan gratuito con acceso muy limitado al Módulo 1 para que pruebes. Pero el plan Pro de $49.99/mes con 3 días gratis te da acceso completo a los 5 tracks. ¿Quieres intentarlo?"],
+  tracks: ["Tenemos 5 tracks: 🌱 Principiante (sin experiencia), 💼 IA para Negocios, 🔧 Constructor (APIs y agentes), 🚀 Avanzado (LLMs y fine-tuning), y 🏛️ Arquitecto Master. Haz el quiz para saber cuál es el tuyo."],
+  certificado: ["¡Sí! Al completar cada track recibes un certificado digital verificable que puedes agregar a tu LinkedIn. Para obtenerlo debes aprobar todos los proyectos — no se regala, eso es lo que le da valor."],
+  cancelar: ["Puedes cancelar cuando quieras desde tu portal de cliente — sin llamadas, sin trámites. Solo un clic y listo. No hay contratos ni penalizaciones."],
+  empezar: ["¡Perfecto! Te recomiendo empezar con el quiz para que el sistema identifique tu nivel y te coloque en el track ideal. Ve a neuralmente.app/quiz.html — son solo 5 preguntas y tarda 2 minutos. 🚀"],
+};
+
+function nmGetDemoResponse(text) {
+  const t = text.toLowerCase();
+  if (t.includes('precio') || t.includes('cuesta') || t.includes('pago') || t.includes('cobr')) return NM_DEMO_RESPONSES.precio[0];
+  if (t.includes('gratis') || t.includes('free') || t.includes('prueba') || t.includes('trial')) return NM_DEMO_RESPONSES.gratis[0];
+  if (t.includes('track') || t.includes('curso') || t.includes('módulo') || t.includes('contenido')) return NM_DEMO_RESPONSES.tracks[0];
+  if (t.includes('certific')) return NM_DEMO_RESPONSES.certificado[0];
+  if (t.includes('cancel') || t.includes('baja') || t.includes('salir')) return NM_DEMO_RESPONSES.cancelar[0];
+  if (t.includes('empez') || t.includes('registr') || t.includes('inscrib') || t.includes('quiero')) return NM_DEMO_RESPONSES.empezar[0];
+  const pool = NM_DEMO_RESPONSES.default;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function nmToggle() {
+  nmOpen = !nmOpen;
+  document.getElementById('nm-box').classList.toggle('open', nmOpen);
+  if (nmOpen && nmFirstOpen) {
+    nmFirstOpen = false;
+    document.querySelector('.nm-chat-btn .notif').style.display = 'none';
+    setTimeout(() => nmBotMsg("¡Hola! 👋 Soy el asistente de NeuralMente. ¿En qué puedo ayudarte hoy?"), 400);
+    setTimeout(() => setQRs(['¿Cuánto cuesta?', '¿Qué aprendo?', 'Quiero empezar', '¿Hay prueba gratis?']), 1200);
+  }
+}
+
+function nmAddMsg(type, text) {
+  const msgs = document.getElementById('nm-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = `nm-msg ${type}`;
+  const bub = document.createElement('div');
+  bub.className = 'nm-bub';
+  bub.textContent = text;
+  wrap.appendChild(bub);
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function nmShowTyping() {
+  const msgs = document.getElementById('nm-msgs');
+  const el = document.createElement('div');
+  el.className = 'nm-typing'; el.id = 'nm-typing';
+  el.innerHTML = '<div class="nm-dots"><div class="nm-dot"></div><div class="nm-dot"></div><div class="nm-dot"></div></div>';
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function nmHideTyping() {
+  const el = document.getElementById('nm-typing');
+  if (el) el.remove();
+}
+
+async function nmBotMsg(text) {
+  nmShowTyping();
+  await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+  nmHideTyping();
+  nmAddMsg('bot', text);
+}
+
+function setQRs(items) {
+  const qr = document.getElementById('nm-qr');
+  qr.innerHTML = '';
+  items.forEach(r => {
+    const b = document.createElement('button');
+    b.className = 'nm-q'; b.textContent = r;
+    b.onclick = () => { document.getElementById('nm-inp').value = r; nmSend(); };
+    qr.appendChild(b);
+  });
+}
+
+async function nmSend() {
+  const inp = document.getElementById('nm-inp');
+  const text = inp.value.trim();
+  if (!text || nmBusy) return;
+  nmBusy = true;
+  inp.value = ''; inp.style.height = 'auto';
+  document.getElementById('nm-qr').innerHTML = '';
+  nmAddMsg('usr', text);
+  nmHistory.push({ role: 'user', content: text });
+
+  let reply;
+  if (NM_DEMO) {
+    reply = nmGetDemoResponse(text);
+    await new Promise(r => setTimeout(r, 500));
+    nmShowTyping();
+    await new Promise(r => setTimeout(r, 700 + Math.random() * 500));
+    nmHideTyping();
+    nmAddMsg('bot', reply);
+  } else {
+    try {
+      nmShowTyping();
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          system: NM_SYSTEM,
+          messages: nmHistory
+        })
+      });
+      const data = await res.json();
+      reply = data.content[0].text;
+      nmHideTyping();
+      nmAddMsg('bot', reply);
+      nmHistory.push({ role: 'assistant', content: reply });
+    } catch(e) {
+      nmHideTyping();
+      nmAddMsg('bot', 'Hubo un error. Intenta de nuevo en un momento.');
+    }
+  }
+
+  // Smart quick replies
+  const t = text.toLowerCase();
+  if (t.includes('precio') || t.includes('cuesta')) {
+    setQRs(['Ver planes', 'Quiero empezar', '¿Puedo cancelar?']);
+  } else if (t.includes('empez') || t.includes('quiero')) {
+    setQRs(['Ir al quiz', 'Ver precios', '¿Qué aprendo?']);
+  } else {
+    setQRs(['¿Cuánto cuesta?', 'Quiero empezar', '¿Hay certificado?']);
+  }
+
+  nmBusy = false;
+}
+
+document.getElementById('nm-inp').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); nmSend(); }
+});
+document.getElementById('nm-inp').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+});
+
+// Show notification after 3 seconds
+setTimeout(() => {
+  if (!nmOpen) document.querySelector('.nm-chat-btn').style.animation = 'none';
+}, 3000);
+</script>
+
 </body>
 </html>

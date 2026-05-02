@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuralMente — Acceso</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--s1:#0d1117;--s2:#131b24;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);
+  --tx:#e8e6f0;--tx2:#8b8a9b;--tx3:#4a4958;
+  --teal:#00d9b0;--td:rgba(0,217,176,.1);--tb:rgba(0,217,176,.25);
+  --pu:#7c6cfc;--pd:rgba(124,108,252,.1);--pb:rgba(124,108,252,.25);
+  --co:#f0634a;--cd:rgba(240,99,74,.1);
+}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'Outfit',sans-serif;}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;min-height:100vh;}
+
+/* Background effect */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(124,108,252,.12),transparent 60%);pointer-events:none;}
+
+/* Logo */
+.logo{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:32px;text-decoration:none;color:var(--tx);}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,217,176,.4);}50%{box-shadow:0 0 0 5px transparent;}}
+
+/* Card */
+.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--b1);border-radius:20px;padding:32px;position:relative;}
+
+/* Tabs */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--s2);border-radius:10px;padding:4px;margin-bottom:28px;}
+.tab{padding:10px;border-radius:8px;font-size:14px;font-weight:600;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--tx2);font-family:inherit;transition:all .2s;}
+.tab.active{background:var(--pu);color:white;}
+
+/* Form */
+.form{display:flex;flex-direction:column;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:13px;font-weight:500;color:var(--tx2);}
+.form-input{background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--tx);font-family:inherit;outline:none;transition:border-color .2s;}
+.form-input::placeholder{color:var(--tx3);}
+.form-input:focus{border-color:var(--pb);}
+.form-input.error{border-color:var(--co);}
+
+/* Button */
+.btn{width:100%;padding:14px;border-radius:11px;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:4px;}
+.btn-primary{background:var(--pu);color:white;}
+.btn-primary:hover{background:#6a5ce8;transform:translateY(-1px);}
+.btn-primary:disabled{background:rgba(124,108,252,.4);cursor:not-allowed;transform:none;}
+
+/* Messages */
+.msg{padding:10px 14px;border-radius:9px;font-size:13px;margin-top:4px;display:none;}
+.msg.error{background:var(--cd);border:1px solid rgba(240,99,74,.3);color:var(--co);display:block;}
+.msg.success{background:var(--td);border:1px solid var(--tb);color:var(--teal);display:block;}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:10px;margin:4px 0;}
+.divider-line{flex:1;height:1px;background:var(--b1);}
+.divider-text{font-size:12px;color:var(--tx3);}
+
+/* Google btn */
+.btn-google{width:100%;padding:12px;border-radius:11px;font-size:14px;font-weight:600;border:1px solid var(--b2);background:var(--s2);color:var(--tx);cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;}
+.btn-google:hover{border-color:var(--b2);background:var(--s2);transform:translateY(-1px);}
+.google-icon{width:18px;height:18px;}
+
+/* Links */
+.form-footer{text-align:center;margin-top:12px;font-size:13px;color:var(--tx2);}
+.form-footer a{color:var(--teal);text-decoration:none;}
+.form-footer a:hover{text-decoration:underline;}
+
+/* Success screen */
+.success-screen{display:none;text-align:center;}
+.success-screen.show{display:block;}
+.success-icon{font-size:52px;margin-bottom:16px;}
+.success-title{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px;}
+.success-desc{font-size:14px;color:var(--tx2);line-height:1.6;margin-bottom:24px;}
+.btn-teal{background:var(--teal);color:#000;font-weight:700;}
+.btn-teal:hover{background:#00c49a;}
+
+/* Loading spinner */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Forgot password */
+.forgot{font-size:12px;color:var(--tx2);text-align:right;cursor:pointer;background:none;border:none;font-family:inherit;padding:0;}
+.forgot:hover{color:var(--teal);}
+
+/* Password strength */
+.pw-strength{height:3px;border-radius:99px;background:var(--s2);margin-top:4px;overflow:hidden;}
+.pw-fill{height:100%;border-radius:99px;width:0%;transition:all .3s;}
+
+@media(max-width:480px){
+  .card{padding:24px 20px;}
+}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="logo">
+  <div class="logo-dot"></div>
+  NeuralMente
+</a>
+
+<div class="card">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="tab-login" onclick="switchTab('login')">Iniciar sesión</button>
+    <button class="tab" id="tab-register" onclick="switchTab('register')">Crear cuenta</button>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="form-login">
+    <div class="form">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="login-email" type="email" placeholder="tu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label class="form-label">Contraseña</label>
+          <button class="forgot" onclick="showForgot()">¿Olvidaste tu contraseña?</button>
+        </div>
+        <input class="form-input" id="login-password" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="msg" id="login-msg"></div>
+      <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">
+        Iniciar sesión
+      </button>
+    </div>
+
+    <div class="divider" style="margin-top:20px;">
+      <div class="divider-line"></div>
+      <span class="divider-text">o continúa con</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <button class="btn-google" onclick="handleGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Continuar con Google
+    </button>
+
+    <div class="form-footer">
+      ¿No tienes cuenta? <a href="#" onclick="switchTab('register')">Créala gratis</a>
+    </div>
+  </div>
+
+  <!-- REGISTER FORM -->
+  <div id="form-register" style="display:none;">
+    <div class="form">
+      <div class="form-group">
+        <label class="form-label">Tu nombre</label>
+        <input class="form-input" id="reg-nombre" type="text" placeholder="Elias García" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="reg-email" type="email" placeholder="tu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input class="form-input" id="reg-password" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="checkPwStrength(this.value)">
+        <div class="pw-strength"><div class="pw-fill" id="pw-fill"></div></div>
+      </div>
+      <div class="msg" id="reg-msg"></div>
+      <button class="btn btn-primary" id="reg-btn" onclick="handleRegister()">
+        Crear cuenta gratis — 3 días de prueba
+      </button>
+    </div>
+
+    <div class="divider" style="margin-top:20px;">
+      <div class="divider-line"></div>
+      <span class="divider-text">o regístrate con</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <button class="btn-google" onclick="handleGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Continuar con Google
+    </button>
+
+    <div class="form-footer">
+      Al registrarte aceptas nuestros <a href="#">Términos</a> y <a href="#">Privacidad</a>
+    </div>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">¡Cuenta creada!</div>
+    <div class="success-desc">Revisa tu email para confirmar tu cuenta. Después podrás acceder al aula y empezar tu trial de 3 días.</div>
+    <button class="btn btn-teal" onclick="window.location.href='aula-interactiva.html'">
+      Ir al aula →
+    </button>
+  </div>
+
+  <!-- FORGOT PASSWORD -->
+  <div id="forgot-screen" style="display:none;">
+    <div style="margin-bottom:20px;">
+      <button onclick="showLogin()" style="background:none;border:none;color:var(--tx2);cursor:pointer;font-size:13px;font-family:inherit;display:flex;align-items:center;gap:4px;">← Volver</button>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px;">Recuperar contraseña</div>
+      <div style="font-size:13px;color:var(--tx2);">Te enviamos un link para restablecer tu contraseña.</div>
+    </div>
+    <div class="form">
+      <div class="form-group">
+        <label class="form-label">Tu email</label>
+        <input class="form-input" id="forgot-email" type="email" placeholder="tu@email.com">
+      </div>
+      <div class="msg" id="forgot-msg"></div>
+      <button class="btn btn-primary" onclick="handleForgot()">Enviar link de recuperación</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── SUPABASE CONFIG ──
+const SUPABASE_URL = 'https://etjjvsnlmlzrwbkgqxkf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0amp2c25sbWx6cndia2dxeGtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MjkzMjAsImV4cCI6MjA5MzMwNTMyMH0.g9JzPbklYhMRZIwNJ7oeK-4GIY7ktz0t9lIJENrVU7k';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── TAB SWITCHING ──
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tab-login').classList.toggle('active', isLogin);
+  document.getElementById('tab-register').classList.toggle('active', !isLogin);
+  document.getElementById('form-login').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('form-register').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('forgot-screen').style.display = 'none';
+  document.getElementById('success-screen').classList.remove('show');
+  clearMsgs();
+}
+
+function showForgot() {
+  document.getElementById('form-login').style.display = 'none';
+  document.getElementById('forgot-screen').style.display = 'block';
+}
+
+function showLogin() {
+  document.getElementById('form-login').style.display = 'block';
+  document.getElementById('forgot-screen').style.display = 'none';
+}
+
+function clearMsgs() {
+  ['login-msg','reg-msg','forgot-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'msg';
+    el.textContent = '';
+  });
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = `msg ${type}`;
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  if (loading) {
+    btn.innerHTML = '<span class="spinner"></span>Un momento...';
+  } else {
+    if (btnId === 'login-btn') btn.innerHTML = 'Iniciar sesión';
+    if (btnId === 'reg-btn') btn.innerHTML = 'Crear cuenta gratis — 3 días de prueba';
+  }
+}
+
+// ── PASSWORD STRENGTH ──
+function checkPwStrength(pw) {
+  const fill = document.getElementById('pw-fill');
+  let strength = 0;
+  if (pw.length >= 8) strength++;
+  if (/[A-Z]/.test(pw)) strength++;
+  if (/[0-9]/.test(pw)) strength++;
+  if (/[^A-Za-z0-9]/.test(pw)) strength++;
+  const colors = ['#f0634a','#f0a935','#f0a935','#00d9b0','#00d9b0'];
+  const widths = ['0%','25%','50%','75%','100%'];
+  fill.style.width = widths[strength];
+  fill.style.background = colors[strength];
+}
+
+// ── SAVE USER TO DB ──
+async function saveUser(user, nombre = '') {
+  try {
+    await db.from('alumnos').upsert({
+      id: user.id,
+      email: user.email,
+      nombre: nombre || user.user_metadata?.full_name || '',
+      plan: 'free',
+      activo: true,
+    }, { onConflict: 'id' });
+  } catch(e) {
+    console.log('User save error:', e);
+  }
+}
+
+// ── LOGIN ──
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  clearMsgs();
+
+  if (!email || !password) {
+    showMsg('login-msg', 'Por favor completa todos los campos.', 'error');
+    return;
+  }
+
+  setLoading('login-btn', true);
+
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    const msgs = {
+      'Invalid login credentials': 'Email o contraseña incorrectos.',
+      'Email not confirmed': 'Confirma tu email antes de entrar. Revisa tu bandeja.',
+    };
+    showMsg('login-msg', msgs[error.message] || 'Error al iniciar sesión. Intenta de nuevo.', 'error');
+    setLoading('login-btn', false);
+    return;
+  }
+
+  // Success — redirect to aula
+  showMsg('login-msg', '✅ Acceso correcto. Entrando al aula...', 'success');
+  setTimeout(() => window.location.href = 'aula-interactiva.html', 1200);
+}
+
+// ── REGISTER ──
+async function handleRegister() {
+  const nombre = document.getElementById('reg-nombre').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  clearMsgs();
+
+  if (!nombre || !email || !password) {
+    showMsg('reg-msg', 'Por favor completa todos los campos.', 'error');
+    return;
+  }
+  if (password.length < 8) {
+    showMsg('reg-msg', 'La contraseña debe tener al menos 8 caracteres.', 'error');
+    return;
+  }
+
+  setLoading('reg-btn', true);
+
+  const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: { data: { nombre } }
+  });
+
+  if (error) {
+    const msgs = {
+      'User already registered': 'Este email ya tiene una cuenta. Inicia sesión.',
+    };
+    showMsg('reg-msg', msgs[error.message] || error.message, 'error');
+    setLoading('reg-btn', false);
+    return;
+  }
+
+  // Save to alumnos table
+  if (data.user) await saveUser(data.user, nombre);
+
+  // Show success
+  document.getElementById('form-register').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+}
+
+// ── GOOGLE ──
+async function handleGoogle() {
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/aula-interactiva.html' }
+  });
+  if (error) alert('Error con Google: ' + error.message);
+}
+
+// ── FORGOT PASSWORD ──
+async function handleForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) {
+    showMsg('forgot-msg', 'Escribe tu email.', 'error');
+    return;
+  }
+
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/login.html'
+  });
+
+  if (error) {
+    showMsg('forgot-msg', 'Error al enviar el email. Intenta de nuevo.', 'error');
+    return;
+  }
+
+  showMsg('forgot-msg', '✅ Email enviado. Revisa tu bandeja de entrada.', 'success');
+}
+
+// ── CHECK SESSION ──
+// If already logged in, go to aula
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) window.location.href = 'aula-interactiva.html';
+});
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const loginVisible = document.getElementById('form-login').style.display !== 'none';
+    const registerVisible = document.getElementById('form-register').style.display !== 'none';
+    if (loginVisible) handleLogin();
+    else if (registerVisible) handleRegister();
+  }
+});
+</script>
+</body>
+</html>
