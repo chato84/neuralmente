@@ -324,7 +324,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <div class="result-track-body" id="result-track-body"></div>
   </div>
 
-  <a href="aula-interactiva.html" class="result-cta" id="result-cta">
+  <a href="precios.html" class="result-cta" id="result-cta">
     Empezar mi plan gratis →
   </a>
   <a href="index.html#precios" class="result-cta-sec">Ver todos los planes</a>
@@ -504,7 +504,7 @@ function showResult() {
 
   const cta = document.getElementById('result-cta');
   cta.style.background = track.color;
-  cta.textContent = `Empezar ${track.name} →`;
+  cta.textContent = `Ver planes para ${track.name} →`;
 
   const testi = document.getElementById('result-testimonial');
   testi.innerHTML = `

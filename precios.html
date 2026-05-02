@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuralMente — Elige tu plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--s1:#0d1117;--s2:#131b24;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);
+  --tx:#e8e6f0;--tx2:#8b8a9b;
+  --teal:#00d9b0;--pu:#7c6cfc;--am:#f0a935;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'Outfit',sans-serif;}
+body{display:flex;flex-direction:column;align-items:center;padding:32px 16px 64px;}
+
+.logo{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px;margin-bottom:48px;color:var(--tx);}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,217,176,.4);}50%{box-shadow:0 0 0 5px transparent;}}
+
+.header{text-align:center;margin-bottom:48px;max-width:600px;}
+.header-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+h1{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-1.5px;margin-bottom:8px;}
+h1 span{color:var(--teal);}
+.header-sub{font-size:15px;color:var(--tx2);line-height:1.6;}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;gap:12px;margin-bottom:40px;}
+.toggle-label{font-size:13px;color:var(--tx2);}
+.toggle-label.active{color:var(--tx);font-weight:600;}
+.toggle{width:44px;height:24px;border-radius:99px;background:var(--pu);cursor:pointer;position:relative;transition:background .2s;}
+.toggle-thumb{width:18px;height:18px;border-radius:50%;background:white;position:absolute;top:3px;left:3px;transition:transform .2s;}
+.toggle.annual .toggle-thumb{transform:translateX(20px);}
+.save-badge{background:rgba(0,217,176,.15);border:1px solid var(--teal);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--teal);}
+
+/* Plans grid */
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;width:100%;max-width:960px;}
+
+.plan{background:var(--s1);border:1.5px solid var(--b1);border-radius:20px;padding:28px;position:relative;transition:transform .2s;}
+.plan:hover{transform:translateY(-4px);}
+.plan.featured{border-color:var(--pu);background:rgba(124,108,252,.05);}
+
+.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--pu);color:white;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 16px;border-radius:99px;white-space:nowrap;}
+
+.plan-name{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);margin-bottom:12px;}
+.plan-price{font-size:52px;font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:4px;}
+.plan-price sup{font-size:24px;font-weight:700;vertical-align:top;margin-top:8px;display:inline-block;}
+.plan-period{font-size:13px;color:var(--tx2);margin-bottom:6px;}
+.plan-annual{font-size:12px;color:var(--teal);margin-bottom:24px;min-height:18px;}
+
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.plan-features li{font-size:13px;color:rgba(232,230,240,.8);display:flex;align-items:flex-start;gap:8px;}
+.feat-check{width:16px;height:16px;border-radius:50%;background:rgba(0,217,176,.15);border:1px solid rgba(0,217,176,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:9px;}
+.feat-x{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:9px;color:var(--tx2);}
+
+.plan-btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:700;text-align:center;text-decoration:none;cursor:pointer;transition:all .2s;border:none;font-family:inherit;}
+.plan-btn.outline{background:transparent;border:1.5px solid var(--b2);color:var(--tx);}
+.plan-btn.outline:hover{border-color:var(--b3);background:rgba(255,255,255,.04);}
+.plan-btn.primary{background:var(--pu);color:white;}
+.plan-btn.primary:hover{background:#6a5ce8;transform:translateY(-1px);}
+.plan-btn.teal{background:var(--teal);color:#000;}
+.plan-btn.teal:hover{background:#00c49a;transform:translateY(-1px);}
+
+/* Guarantee */
+.guarantee{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px 20px;margin-top:32px;max-width:600px;width:100%;}
+.guarantee-icon{font-size:28px;flex-shrink:0;}
+.guarantee-title{font-size:14px;font-weight:700;margin-bottom:3px;}
+.guarantee-desc{font-size:12px;color:var(--tx2);line-height:1.5;}
+
+/* FAQ */
+.faq{width:100%;max-width:600px;margin-top:48px;}
+.faq-title{font-size:20px;font-weight:700;letter-spacing:-.3px;text-align:center;margin-bottom:20px;}
+.faq-item{border-bottom:1px solid var(--b1);padding:16px 0;cursor:pointer;}
+.faq-q{font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+.faq-q span{color:var(--tx2);font-size:18px;transition:transform .2s;}
+.faq-a{font-size:13px;color:var(--tx2);line-height:1.6;margin-top:10px;display:none;}
+.faq-item.open .faq-a{display:block;}
+.faq-item.open .faq-q span{transform:rotate(45deg);}
+
+/* Back link */
+.back{font-size:13px;color:var(--tx2);text-decoration:none;margin-bottom:24px;display:flex;align-items:center;gap:5px;align-self:flex-start;max-width:960px;width:100%;}
+.back:hover{color:var(--tx);}
+</style>
+</head>
+<body>
+
+<div class="logo"><div class="logo-dot"></div>NeuralMente</div>
+
+<a href="quiz.html" class="back">← Volver al quiz</a>
+
+<div class="header">
+  <div class="header-tag">🎯 Tu plan personalizado</div>
+  <h1>Invierte en tu <span>futuro con IA</span></h1>
+  <p class="header-sub">Sin contratos. Cancela cuando quieras. Todos los planes incluyen acceso al tutor IA ilimitado en español.</p>
+</div>
+
+<!-- Toggle anual/mensual -->
+<div class="toggle-wrap">
+  <span class="toggle-label active" id="monthly-label">Mensual</span>
+  <div class="toggle" id="toggle" onclick="toggleBilling()">
+    <div class="toggle-thumb"></div>
+  </div>
+  <span class="toggle-label" id="annual-label">Anual</span>
+  <span class="save-badge">Ahorra 30%</span>
+</div>
+
+<!-- Plans -->
+<div class="plans">
+
+  <!-- Plan gratuito -->
+  <div class="plan">
+    <div class="plan-name">Explorador</div>
+    <div class="plan-price"><sup>$</sup><span class="price-val">0</span></div>
+    <div class="plan-period">para siempre gratis</div>
+    <div class="plan-annual"></div>
+    <ul class="plan-features">
+      <li><div class="feat-check">✓</div>Acceso al Track 1 — Módulo 1</li>
+      <li><div class="feat-check">✓</div>50 mensajes con el tutor IA</li>
+      <li><div class="feat-check">✓</div>1 proyecto evaluado</li>
+      <li><div class="feat-x">—</div><span style="color:var(--tx2)">Tracks 2, 3, 4 y 5</span></li>
+      <li><div class="feat-x">—</div><span style="color:var(--tx2)">Certificados verificables</span></li>
+      <li><div class="feat-x">—</div><span style="color:var(--tx2)">Tutor IA ilimitado</span></li>
+    </ul>
+    <a href="aula-interactiva.html" class="plan-btn outline">Empezar gratis</a>
+  </div>
+
+  <!-- Plan Pro — FEATURED -->
+  <div class="plan featured">
+    <div class="plan-badge">⭐ Más popular</div>
+    <div class="plan-name">Pro</div>
+    <div class="plan-price"><sup>$</sup><span class="price-val" id="pro-price">49</span></div>
+    <div class="plan-period" id="pro-period">por mes · cancela cuando quieras</div>
+    <div class="plan-annual" id="pro-annual"></div>
+    <ul class="plan-features">
+      <li><div class="feat-check">✓</div>Todos los 5 tracks desbloqueados</li>
+      <li><div class="feat-check">✓</div>Tutor IA ilimitado con memoria</li>
+      <li><div class="feat-check">✓</div>Videos educativos completos</li>
+      <li><div class="feat-check">✓</div>Proyectos evaluados ilimitados</li>
+      <li><div class="feat-check">✓</div>Certificados verificables en LinkedIn</li>
+      <li><div class="feat-check">✓</div>Acceso a nuevos módulos al instante</li>
+      <li><div class="feat-check">✓</div>Sistema de XP y badges</li>
+    </ul>
+    <a href="aula-interactiva.html" class="plan-btn primary" id="pro-btn">Comenzar — 7 días gratis →</a>
+  </div>
+
+  <!-- Plan Empresas -->
+  <div class="plan">
+    <div class="plan-name">Empresas</div>
+    <div class="plan-price"><sup>$</sup><span class="price-val" id="biz-price">199</span></div>
+    <div class="plan-period" id="biz-period">por mes · hasta 10 usuarios</div>
+    <div class="plan-annual" id="biz-annual"></div>
+    <ul class="plan-features">
+      <li><div class="feat-check">✓</div>Todo lo del plan Pro</li>
+      <li><div class="feat-check">✓</div>Dashboard de equipo y progreso</li>
+      <li><div class="feat-check">✓</div>Cursos personalizados a tu empresa</li>
+      <li><div class="feat-check">✓</div>Reportes de progreso del equipo</div></li>
+      <li><div class="feat-check">✓</div>Onboarding dedicado</li>
+      <li><div class="feat-check">✓</div>Factura fiscal</li>
+    </ul>
+    <a href="mailto:hola@neuralmente.app" class="plan-btn teal">Hablar con ventas →</a>
+  </div>
+
+</div>
+
+<!-- Guarantee -->
+<div class="guarantee">
+  <div class="guarantee-icon">🛡️</div>
+  <div>
+    <div class="guarantee-title">Garantía de 7 días sin riesgo</div>
+    <div class="guarantee-desc">Si en los primeros 7 días no estás satisfecho por cualquier razón, te devolvemos el 100% de tu dinero. Sin preguntas, sin complicaciones.</div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq">
+  <div class="faq-title">Preguntas frecuentes</div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">¿Puedo cancelar en cualquier momento? <span>+</span></div>
+    <div class="faq-a">Sí. No hay contratos ni compromisos. Cancelas desde tu perfil con un clic y no se te cobra nada más. Mantienes acceso hasta el final del período pagado.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">¿El tutor IA es realmente diferente a ChatGPT? <span>+</span></div>
+    <div class="faq-a">Sí. El tutor de NeuralMente no espera que preguntes — lleva la clase activamente. Explica conceptos, hace preguntas de comprensión, evalúa tus proyectos y avanza al siguiente tema. Está entrenado específicamente para enseñar IA en español y recuerda tu progreso entre sesiones.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">¿Cuánto tiempo necesito dedicar por semana? <span>+</span></div>
+    <div class="faq-a">Cada módulo toma entre 60 y 90 minutos. Puedes ir a tu ritmo — no hay horarios fijos. Si dedicas 3-5 horas por semana, completas el Track 1 en 12 semanas.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">¿Los certificados tienen valor real? <span>+</span></div>
+    <div class="faq-a">Sí. Son certificados digitales verificables que puedes agregar a tu LinkedIn. Para obtenerlos debes completar los proyectos y pasar la evaluación del tutor IA — no se regalan. Eso es lo que les da valor.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">¿Necesito saber inglés o programar? <span>+</span></div>
+    <div class="faq-a">No. Todo el contenido es 100% en español. El Track 1 no requiere programación. Los tracks avanzados sí introducen código, pero de forma progresiva y con el tutor guiándote en cada paso.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">¿Qué pasa si ya sé algo de IA? <span>+</span></div>
+    <div class="faq-a">El quiz de entrada detecta tu nivel y te coloca en el track correcto. No tienes que empezar desde cero si ya tienes base. Puedes ir directo al Track 2 o 3 según tu nivel.</div>
+  </div>
+</div>
+
+<script>
+let isAnnual = false;
+
+function toggleBilling() {
+  isAnnual = !isAnnual;
+  const toggle = document.getElementById('toggle');
+  toggle.classList.toggle('annual', isAnnual);
+  document.getElementById('monthly-label').classList.toggle('active', !isAnnual);
+  document.getElementById('annual-label').classList.toggle('active', isAnnual);
+
+  if (isAnnual) {
+    document.getElementById('pro-price').textContent = '34';
+    document.getElementById('pro-period').textContent = 'por mes · facturado anualmente';
+    document.getElementById('pro-annual').textContent = '$408/año — ahorras $180';
+    document.getElementById('biz-price').textContent = '139';
+    document.getElementById('biz-period').textContent = 'por mes · facturado anualmente';
+    document.getElementById('biz-annual').textContent = '$1,668/año — ahorras $720';
+    document.getElementById('pro-btn').textContent = 'Comenzar plan anual →';
+  } else {
+    document.getElementById('pro-price').textContent = '49';
+    document.getElementById('pro-period').textContent = 'por mes · cancela cuando quieras';
+    document.getElementById('pro-annual').textContent = '';
+    document.getElementById('biz-price').textContent = '199';
+    document.getElementById('biz-period').textContent = 'por mes · hasta 10 usuarios';
+    document.getElementById('biz-annual').textContent = '';
+    document.getElementById('pro-btn').textContent = 'Comenzar — 7 días gratis →';
+  }
+}
+
+function toggleFaq(el) {
+  el.classList.toggle('open');
+}
+</script>
+</body>
+</html>
